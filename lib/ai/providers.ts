@@ -13,7 +13,7 @@ export const myProvider = isTestEnvironment
         chatModel,
         reasoningModel,
         titleModel,
-      } = require("./models.mock");
+      } = require("./models.test");
       return customProvider({
         languageModels: {
           "chat-model": chatModel,

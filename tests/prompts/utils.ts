@@ -278,5 +278,12 @@ As we move forward, Silicon Valley continues to reinvent itself. While some pred
     ];
   }
 
-  return [{ id: "6", type: "text-delta", delta: "Unknown test prompt!" }];
+  return [
+    ...textToDeltas("Unknown test prompt!"),
+    {
+      type: "finish",
+      finishReason: "stop",
+      usage: { inputTokens: 3, outputTokens: 10, totalTokens: 13 },
+    },
+  ];
 };

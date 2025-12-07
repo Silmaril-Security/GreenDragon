@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronUp } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { User } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
@@ -51,13 +50,9 @@ export function SidebarUserNav({ user }: { user: User }) {
                 className="h-10 bg-background data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 data-testid="user-nav-button"
               >
-                <Image
-                  alt={user.email ?? "User Avatar"}
-                  className="rounded-full"
-                  height={24}
-                  src={`https://avatar.vercel.sh/${user.email}`}
-                  width={24}
-                />
+                <div className="flex size-6 shrink-0 items-center justify-center rounded-full ring-1 ring-border text-xs uppercase">
+                  {(isGuest ? "G" : user?.email?.[0]) ?? "U"}
+                </div>
                 <span className="truncate" data-testid="user-email">
                   {isGuest ? "Guest" : user?.email}
                 </span>
