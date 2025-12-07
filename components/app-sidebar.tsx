@@ -73,11 +73,11 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <span className="flex cursor-pointer items-center gap-2 rounded-md px-2 hover:bg-muted">
                   <SilmarilIcon />
                   <span className="flex flex-col">
-                    <span className="font-semibold text-xs uppercase tracking-widest">
+                    <span className="bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-500 bg-clip-text font-semibold text-transparent text-xs uppercase tracking-widest dark:from-emerald-300 dark:via-teal-200 dark:to-sky-300">
                       Green Dragon
                     </span>
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                      Silmaril
+                    <span className="text-[10px] tracking-wider text-muted-foreground">
+                      By Silmaril
                     </span>
                   </span>
                 </span>
