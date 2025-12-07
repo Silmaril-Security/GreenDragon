@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Diamond shape from Silmaril logo -->
+  <!-- Original bounds: x(20-31.606), y(17.152-30.848) = width 11.606, height 13.696 -->
+  <!-- Center: x=25.803, y=24 -->
+  <g transform="translate(16, 16) scale(2.2) translate(-25.803, -24)">
+    <path d="M 29.071 24.068 L 25.798 20.068 L 22.525 24.068 L 25.798 27.947 Z" fill="transparent" stroke-width="0.5" stroke="white" stroke-miterlimit="10"></path>
+    <path d="M 29.666 24.424 L 26.273 28.605 L 26.273 30.848 L 31.606 24.424 Z" fill="transparent" stroke-width="0.5" stroke="white" stroke-miterlimit="10"></path>
+    <path d="M 21.939 23.576 L 25.334 19.395 L 25.334 17.152 L 20 23.576 Z" fill="transparent" stroke-width="0.5" stroke="white" stroke-miterlimit="10"></path>
+    <path d="M 21.939 24.424 L 25.334 28.605 L 25.334 30.848 L 20 24.424 Z" fill="transparent" stroke-width="0.5" stroke="white" stroke-miterlimit="10"></path>
+    <path d="M 29.666 23.576 L 26.273 19.395 L 26.273 17.152 L 31.606 23.576 Z" fill="transparent" stroke-width="0.5" stroke="white" stroke-miterlimit="10"></path>
+  </g>
+</svg>

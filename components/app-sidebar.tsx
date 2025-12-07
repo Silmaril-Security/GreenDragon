@@ -7,7 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { unstable_serialize } from "swr/infinite";
-import { PlusIcon, TrashIcon } from "@/components/icons";
+import { PlusIcon, SilmarilIcon, TrashIcon } from "@/components/icons";
 import {
   getChatHistoryPaginationKey,
   SidebarHistory,
@@ -70,8 +70,16 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   setOpenMobile(false);
                 }}
               >
-                <span className="cursor-pointer rounded-md px-2 font-semibold text-lg hover:bg-muted">
-                  Chatbot
+                <span className="flex cursor-pointer items-center gap-2 rounded-md px-2 hover:bg-muted">
+                  <SilmarilIcon />
+                  <span className="flex flex-col">
+                    <span className="font-semibold text-xs uppercase tracking-widest">
+                      Green Dragon
+                    </span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Silmaril
+                    </span>
+                  </span>
                 </span>
               </Link>
               <div className="flex flex-row gap-1">
