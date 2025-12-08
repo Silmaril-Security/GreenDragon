@@ -1,15 +1,31 @@
 "use client";
 
 import { Link2, Linkedin } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { toast } from "sonner";
-import { useCopyToClipboard, useWindowSize } from "usehooks-ts";
+import { useCopyToClipboard } from "usehooks-ts";
+import useSWR, { useSWRConfig } from "swr";
+import { unstable_serialize } from "swr/infinite";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "./icons";
-import { useSidebar } from "./ui/sidebar";
+import { PlusIcon, TrashIcon } from "./icons";
+import { getChatHistoryPaginationKey } from "./sidebar-history";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import { VisibilitySelector, type VisibilityType } from "./visibility-selector";
 
 function PureChatHeader({
@@ -22,28 +38,77 @@ function PureChatHeader({
   isReadonly: boolean;
 }) {
   const router = useRouter();
-  const { open } = useSidebar();
-  const { width: windowWidth } = useWindowSize();
   const [_, copyToClipboard] = useCopyToClipboard();
-  const { resolvedTheme } = useTheme();
+  const { mutate } = useSWRConfig();
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+
+  const { data: starCount } = useSWR(
+    "github-stars",
+    async () => {
+      const res = await fetch(
+        "https://api.github.com/repos/Silmaril-Security/GreenDragon"
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.stargazers_count as number;
+    },
+    { revalidateOnFocus: false, dedupingInterval: 3600000 }
+  );
+
+  const handleDeleteAll = () => {
+    const deletePromise = fetch("/api/history", {
+      method: "DELETE",
+    });
+
+    toast.promise(deletePromise, {
+      loading: "Deleting all chats...",
+      success: () => {
+        mutate(unstable_serialize(getChatHistoryPaginationKey));
+        router.push("/");
+        setShowDeleteAllDialog(false);
+        return "All chats deleted successfully";
+      },
+      error: "Failed to delete all chats",
+    });
+  };
 
   return (
+    <>
     <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
       <SidebarToggle />
 
-      {(!open || windowWidth < 768) && (
-        <Button
-          className="order-2 ml-auto h-8 px-2 md:order-1 md:ml-0 md:h-fit md:px-2"
-          onClick={() => {
-            router.push("/");
-            router.refresh();
-          }}
-          variant="outline"
-        >
-          <PlusIcon />
-          <span className="md:sr-only">New Chat</span>
-        </Button>
-      )}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            className="h-8 px-2 md:h-fit md:px-2"
+            onClick={() => {
+              router.push("/");
+              router.refresh();
+            }}
+            variant="outline"
+          >
+            <PlusIcon />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent align="start" className="hidden md:block">
+          New Chat
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            className="h-8 px-2 md:h-fit md:px-2"
+            onClick={() => setShowDeleteAllDialog(true)}
+            variant="outline"
+          >
+            <TrashIcon />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent align="start" className="hidden md:block">
+          Delete All Chats
+        </TooltipContent>
+      </Tooltip>
 
       {!isReadonly && (
         <VisibilitySelector
@@ -53,39 +118,89 @@ function PureChatHeader({
         />
       )}
 
-      <div className="order-3 flex items-center gap-1 md:ml-auto">
-        <Button
-          variant="ghost"
-          className="h-8 p-1 md:h-fit md:p-2"
-          onClick={async () => {
-            await copyToClipboard(window.location.href);
-            toast.success("Link copied to clipboard!");
-          }}
-        >
-          <Link2 />
-          <span className="sr-only">Copy link</span>
-        </Button>
-        <Button variant="ghost" className="h-8 p-1 md:h-fit md:p-2" asChild>
-          <a
-            href="https://www.linkedin.com/company/silmarilsecurity"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Linkedin />
-            <span className="sr-only">LinkedIn</span>
-          </a>
-        </Button>
-        <iframe
-          src="https://ghbtns.com/github-btn.html?user=Silmaril-Security&repo=GreenDragon&type=star&count=true"
-          frameBorder="0"
-          scrolling="no"
-          width="100"
-          height="20"
-          title="GitHub Stars"
-          className={`hidden overflow-hidden md:block ${resolvedTheme === "dark" ? "invert" : ""}`}
-        />
+      <div className="order-3 flex items-center gap-2 md:ml-auto">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-8 px-2 md:h-fit md:px-2"
+              onClick={async () => {
+                await copyToClipboard(window.location.href);
+                toast.success("Link copied to clipboard!");
+              }}
+            >
+              <Link2 />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="hidden md:block">
+            Copy link
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" className="h-8 px-2 md:h-fit md:px-2" asChild>
+              <a
+                href="https://www.linkedin.com/company/silmarilsecurity"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin />
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="hidden md:block">
+            LinkedIn
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" className="h-8 gap-1.5 px-2 md:h-fit md:px-2" asChild>
+              <a
+                href="https://github.com/Silmaril-Security/GreenDragon"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  className="size-4"
+                  fill="currentColor"
+                >
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+                {starCount !== null && starCount !== undefined && (
+                  <span className="text-xs">{starCount}</span>
+                )}
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="hidden md:block">
+            Star on GitHub
+          </TooltipContent>
+        </Tooltip>
       </div>
     </header>
+
+    <AlertDialog
+      onOpenChange={setShowDeleteAllDialog}
+      open={showDeleteAllDialog}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete all chats?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete all
+            your chats and remove them from our servers.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDeleteAll}>
+            Delete All
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
 
