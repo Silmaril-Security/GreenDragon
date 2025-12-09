@@ -8,6 +8,13 @@
       "when": 1765245494311,
       "tag": "0000_moaning_darkstar",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1733769274000,
+      "tag": "0001_add_challenges_and_leaderboard",
+      "breakpoints": true
     }
   ]
 }
