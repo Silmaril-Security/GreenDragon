@@ -8,7 +8,7 @@ export const Greeting = () => {
     >
       <motion.div
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-emerald-500 via-teal-400 to-sky-500 bg-clip-text font-semibold text-transparent text-xl dark:from-emerald-300 dark:via-teal-200 dark:to-sky-300 md:text-2xl"
+        className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-semibold text-transparent text-xl dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300 md:text-2xl"
         exit={{ opacity: 0, y: 10 }}
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5 }}
@@ -56,6 +56,19 @@ export const Greeting = () => {
       >
         Solve hyper-realistic security challenges, earn points, and start your
         white-hat AI hacker journey.
+      </motion.div>
+      <motion.div
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8 flex justify-center"
+        exit={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 10 }}
+        transition={{ delay: 0.8 }}
+      >
+<img
+          alt="Green Dragon"
+          className="w-full max-w-md rounded-2xl drop-shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+          src="/green-dragon.jpeg"
+        />
       </motion.div>
     </div>
   );
