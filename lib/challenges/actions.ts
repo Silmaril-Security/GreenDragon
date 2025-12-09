@@ -16,10 +16,9 @@ export type ChallengeWithStatus = {
 };
 
 export async function getChallengesWithStatus(): Promise<ChallengeWithStatus[]> {
-  const challenges = await getChallenges();
+  const [challenges, session] = await Promise.all([getChallenges(), auth()]);
 
-  const session = await auth();
-  const solvedIds = new Set<string>();
+  let solvedIds = new Set<string>();
 
   if (session?.user?.id) {
     const progress = await getUserChallengeProgress({ userId: session.user.id });
