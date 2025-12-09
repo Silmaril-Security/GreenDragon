@@ -46,18 +46,20 @@ function SortableHeader({
     <button
       onClick={() => onSort(field)}
       className={cn(
-        "flex items-center gap-1 hover:text-foreground transition-colors",
+        "group flex items-center gap-1 hover:text-foreground transition-colors",
         isActive && "text-foreground",
         className
       )}
     >
       {children}
-      {isActive && (
+      {isActive ? (
         direction === "asc" ? (
           <ArrowUp className="size-3" />
         ) : (
           <ArrowDown className="size-3" />
         )
+      ) : (
+        <ArrowUp className="size-3 opacity-0 group-hover:opacity-50 transition-opacity" />
       )}
     </button>
   );
@@ -86,13 +88,15 @@ export function ChallengesTable({
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border bg-card">
         {/* Header */}
-        <div className="hidden border-b px-4 py-3 text-sm font-medium text-muted-foreground sm:grid sm:grid-cols-[40px_1fr_140px_100px_60px] sm:gap-4">
+        <div className="hidden border-b px-4 py-3 text-sm font-medium text-muted-foreground sm:grid sm:grid-cols-[70px_1fr_140px_100px_60px] sm:gap-4">
           <SortableHeader
             field="status"
             currentField={sortField}
             direction={sortDirection}
             onSort={onSort}
-          />
+          >
+            Status
+          </SortableHeader>
           <SortableHeader
             field="title"
             currentField={sortField}
@@ -168,7 +172,7 @@ export function ChallengesTable({
                   </div>
 
                   {/* Desktop layout */}
-                  <div className="hidden sm:grid sm:grid-cols-[40px_1fr_140px_100px_60px] sm:items-center sm:gap-4">
+                  <div className="hidden sm:grid sm:grid-cols-[70px_1fr_140px_100px_60px] sm:items-center sm:gap-4">
                     <span
                       className={cn(
                         "text-lg",

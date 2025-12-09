@@ -43,6 +43,11 @@ export type CustomUIDataTypes = {
   clear: null;
   finish: null;
   usage: AppUsage;
+  challengeSolved: {
+    challengeId: string;
+    title: string;
+    points: number;
+  };
 };
 
 export type ChatMessage = UIMessage<

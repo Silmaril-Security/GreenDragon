@@ -1,7 +1,10 @@
 import { ChallengesContent } from "@/components/challenges/challenges-content";
 import { ChallengesHeader } from "@/components/challenges/challenges-header";
+import { getChallengesWithStatus } from "@/lib/challenges/actions";
 
-export default function ChallengesPage() {
+export default async function ChallengesPage() {
+  const challenges = await getChallengesWithStatus();
+
   return (
     <div className="flex h-full flex-col overflow-auto">
       <ChallengesHeader />
@@ -12,7 +15,7 @@ export default function ChallengesPage() {
             Learn the rules. Exploit the system.
           </p>
         </div>
-        <ChallengesContent />
+        <ChallengesContent challenges={challenges} />
       </div>
     </div>
   );

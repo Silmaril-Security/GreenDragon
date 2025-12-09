@@ -10,6 +10,7 @@ import {
   gte,
   inArray,
   lt,
+  sql,
   type SQL,
 } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -20,6 +21,10 @@ import { ChatSDKError } from "../errors";
 import type { AppUsage } from "../usage";
 import { generateUUID } from "../utils";
 import {
+  type Challenge,
+  challenge,
+  type ChallengeProgress,
+  challengeProgress,
   type Chat,
   chat,
   type DBMessage,
@@ -591,4 +596,203 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
       "Failed to get stream ids by chat id"
     );
   }
+}
+
+// Challenge queries
+
+export async function getChallenges(): Promise<Challenge[]> {
+  try {
+    return await db
+      .select()
+      .from(challenge)
+      .where(eq(challenge.isActive, true))
+      .orderBy(asc(challenge.sortOrder), asc(challenge.createdAt));
+  } catch (_error) {
+    throw new ChatSDKError("bad_request:database", "Failed to get challenges");
+  }
+}
+
+export async function getChallengeBySlug({
+  slug,
+}: {
+  slug: string;
+}): Promise<Challenge | null> {
+  try {
+    const [result] = await db
+      .select()
+      .from(challenge)
+      .where(eq(challenge.slug, slug));
+    return result || null;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get challenge by slug"
+    );
+  }
+}
+
+export async function getChallengeById({
+  id,
+}: {
+  id: string;
+}): Promise<Challenge | null> {
+  try {
+    const [result] = await db
+      .select()
+      .from(challenge)
+      .where(eq(challenge.id, id));
+    return result || null;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get challenge by id"
+    );
+  }
+}
+
+export async function getUserChallengeProgress({
+  userId,
+}: {
+  userId: string;
+}): Promise<ChallengeProgress[]> {
+  try {
+    return await db
+      .select()
+      .from(challengeProgress)
+      .where(eq(challengeProgress.userId, userId));
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get user challenge progress"
+    );
+  }
+}
+
+export async function isChallengeSolved({
+  userId,
+  challengeId,
+}: {
+  userId: string;
+  challengeId: string;
+}): Promise<boolean> {
+  try {
+    const [result] = await db
+      .select()
+      .from(challengeProgress)
+      .where(
+        and(
+          eq(challengeProgress.userId, userId),
+          eq(challengeProgress.challengeId, challengeId)
+        )
+      );
+    return !!result;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to check if challenge is solved"
+    );
+  }
+}
+
+export async function markChallengeSolved({
+  userId,
+  challengeId,
+  points,
+}: {
+  userId: string;
+  challengeId: string;
+  points: number;
+}): Promise<void> {
+  try {
+    await db.transaction(async (tx) => {
+      // Insert progress record
+      await tx.insert(challengeProgress).values({
+        userId,
+        challengeId,
+        solvedAt: new Date(),
+      });
+
+      // Increment user counters
+      await tx
+        .update(user)
+        .set({
+          totalPoints: sql`${user.totalPoints} + ${points}`,
+          solvedCount: sql`${user.solvedCount} + 1`,
+        })
+        .where(eq(user.id, userId));
+    });
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to mark challenge as solved"
+    );
+  }
+}
+
+export async function getLeaderboard({
+  limit = 100,
+}: {
+  limit?: number;
+} = {}): Promise<
+  Array<{
+    userId: string;
+    email: string;
+    totalPoints: number;
+    solvedCount: number;
+  }>
+> {
+  try {
+    return await db
+      .select({
+        userId: user.id,
+        email: user.email,
+        totalPoints: user.totalPoints,
+        solvedCount: user.solvedCount,
+      })
+      .from(user)
+      .where(gt(user.totalPoints, 0))
+      .orderBy(desc(user.totalPoints), desc(user.solvedCount))
+      .limit(limit);
+  } catch (_error) {
+    throw new ChatSDKError("bad_request:database", "Failed to get leaderboard");
+  }
+}
+
+export async function clearUserProgress({
+  userId,
+}: {
+  userId: string;
+}): Promise<void> {
+  try {
+    await db.transaction(async (tx) => {
+      // Delete progress records
+      await tx
+        .delete(challengeProgress)
+        .where(eq(challengeProgress.userId, userId));
+
+      // Reset user counters
+      await tx
+        .update(user)
+        .set({ totalPoints: 0, solvedCount: 0 })
+        .where(eq(user.id, userId));
+    });
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to clear user progress"
+    );
+  }
+}
+
+export async function getSolvedChallengeIds({
+  userId,
+}: {
+  userId: string;
+}): Promise<Set<string>> {
+  const solved = await db
+    .select({ challengeId: challengeProgress.challengeId })
+    .from(challengeProgress)
+    .where(eq(challengeProgress.userId, userId));
+
+  return new Set(solved.map((s) => s.challengeId));
 }

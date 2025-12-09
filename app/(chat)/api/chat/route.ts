@@ -31,12 +31,16 @@ import {
   createStreamId,
   deleteChatById,
   getChatById,
+  getChallenges,
   getMessageCountByUserId,
   getMessagesByChatId,
+  getSolvedChallengeIds,
+  markChallengeSolved,
   saveChat,
   saveMessages,
   updateChatLastContextById,
 } from "@/lib/db/queries";
+import { validateResponse } from "@/lib/challenges/validation";
 import type { DBMessage } from "@/lib/db/schema";
 import { ChatSDKError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
@@ -207,7 +211,7 @@ export async function POST(request: Request) {
             isEnabled: isProductionEnvironment,
             functionId: "stream-text",
           },
-          onFinish: async ({ usage }) => {
+          onFinish: async ({ usage, text }) => {
             try {
               const providers = await getTokenlensCatalog();
               const modelId =
@@ -218,25 +222,55 @@ export async function POST(request: Request) {
                   type: "data-usage",
                   data: finalMergedUsage,
                 });
-                return;
-              }
-
-              if (!providers) {
+              } else if (!providers) {
                 finalMergedUsage = usage;
                 dataStream.write({
                   type: "data-usage",
                   data: finalMergedUsage,
                 });
-                return;
+              } else {
+                const summary = getUsage({ modelId, usage, providers });
+                finalMergedUsage = { ...usage, ...summary, modelId } as AppUsage;
+                dataStream.write({ type: "data-usage", data: finalMergedUsage });
               }
-
-              const summary = getUsage({ modelId, usage, providers });
-              finalMergedUsage = { ...usage, ...summary, modelId } as AppUsage;
-              dataStream.write({ type: "data-usage", data: finalMergedUsage });
             } catch (err) {
               console.warn("TokenLens enrichment failed", err);
               finalMergedUsage = usage;
               dataStream.write({ type: "data-usage", data: finalMergedUsage });
+            }
+
+            // Validate response against unsolved challenges
+            if (session?.user?.id && text) {
+              try {
+                const [allChallenges, solvedIds] = await Promise.all([
+                  getChallenges(),
+                  getSolvedChallengeIds({ userId: session.user.id }),
+                ]);
+
+                for (const challenge of allChallenges) {
+                  if (solvedIds.has(challenge.id)) continue;
+
+                  const result = validateResponse(text, challenge);
+                  if (result.success) {
+                    await markChallengeSolved({
+                      userId: session.user.id,
+                      challengeId: challenge.id,
+                      points: challenge.points,
+                    });
+
+                    dataStream.write({
+                      type: "data-challengeSolved",
+                      data: {
+                        challengeId: challenge.id,
+                        title: challenge.title,
+                        points: challenge.points,
+                      },
+                    });
+                  }
+                }
+              } catch (err) {
+                console.warn("Challenge validation failed", err);
+              }
             }
           },
         });

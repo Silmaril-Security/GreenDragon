@@ -114,6 +114,12 @@ export function Chat({
       if (dataPart.type === "data-usage") {
         setUsage(dataPart.data);
       }
+      if (dataPart.type === "data-challengeSolved") {
+        toast({
+          type: "success",
+          description: `Solved! ${dataPart.data.title} +${dataPart.data.points}`,
+        });
+      }
     },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));

@@ -8,11 +8,15 @@ import {
   type Category,
   type Difficulty,
   type ChallengeStatus,
-  challenges,
   difficultyConfig,
 } from "@/lib/challenges/data";
+import type { ChallengeWithStatus } from "@/lib/challenges/actions";
 
 const ITEMS_PER_PAGE = 10;
+
+interface ChallengesContentProps {
+  challenges: ChallengeWithStatus[];
+}
 
 const difficultyOrder: Record<Difficulty, number> = {
   novice: 0,
@@ -28,7 +32,7 @@ const statusOrder: Record<ChallengeStatus, number> = {
   "not-started": 2,
 };
 
-export function ChallengesContent() {
+export function ChallengesContent({ challenges }: ChallengesContentProps) {
   const [category, setCategory] = useState<Category | "all">("all");
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
   const [status, setStatus] = useState<ChallengeStatus | "all">("all");
@@ -61,7 +65,7 @@ export function ChallengesContent() {
     );
 
     return { totalSolved, total, byDifficulty };
-  }, []);
+  }, [challenges]);
 
   // Filter challenges
   const filteredChallenges = useMemo(() => {
@@ -78,7 +82,7 @@ export function ChallengesContent() {
         return false;
       return true;
     });
-  }, [category, difficulty, status, search]);
+  }, [challenges, category, difficulty, status, search]);
 
   // Sort challenges
   const sortedChallenges = useMemo(() => {
