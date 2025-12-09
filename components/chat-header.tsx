@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { memo, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
@@ -39,6 +41,8 @@ function PureChatHeader({
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const { data: session } = useSession();
+  const isGuest = session?.user?.type === "guest";
 
   const handleDeleteAll = () => {
     const deletePromise = fetch("/api/history", {
@@ -103,7 +107,12 @@ function PureChatHeader({
         />
       )}
 
-      <div className="order-3 md:ml-auto">
+      <div className="order-3 ml-auto flex items-center gap-2">
+        {isGuest && (
+          <Button asChild size="sm">
+            <Link href="/register">Register</Link>
+          </Button>
+        )}
         <SocialLinks />
       </div>
     </header>

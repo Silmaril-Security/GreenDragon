@@ -71,6 +71,15 @@ export function Chat({
   }, [router]);
   const { setDataStream } = useDataStream();
 
+  // Clear stale dataStream state on mount/unmount to prevent empty responses after navigation
+  useEffect(() => {
+    setDataStream([]);
+
+    return () => {
+      setDataStream([]);
+    };
+  }, [setDataStream]);
+
   const [input, setInput] = useState<string>("");
   const [usage, setUsage] = useState<AppUsage | undefined>(initialLastContext);
   const [showCreditCardAlert, setShowCreditCardAlert] = useState(false);

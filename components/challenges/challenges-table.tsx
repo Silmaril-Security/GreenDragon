@@ -159,7 +159,10 @@ export function ChallengesTable({
                     </span>
                     <div className="flex-1">
                       <div className="font-medium">{challenge.title}</div>
-                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                      <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                        {challenge.description}
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
                         <span className="text-muted-foreground">
                           {catConfig.label}
                         </span>

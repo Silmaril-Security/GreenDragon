@@ -394,6 +394,9 @@ function PureMultimodalInput({
           )}
         </PromptInputToolbar>
       </PromptInput>
+      <p className="text-center text-xs text-muted-foreground">
+        Every solved challenge helps secure AI against real threats.
+      </p>
     </div>
   );
 }

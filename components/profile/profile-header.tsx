@@ -1,16 +1,7 @@
 "use client";
 
-import { SidebarToggle } from "@/components/sidebar-toggle";
-import { SocialLinks } from "@/components/social-links";
+import { PageHeader } from "@/components/page-header";
 
 export function ProfileHeader() {
-  return (
-    <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
-      <SidebarToggle />
-
-      <div className="md:ml-auto">
-        <SocialLinks />
-      </div>
-    </header>
-  );
+  return <PageHeader />;
 }

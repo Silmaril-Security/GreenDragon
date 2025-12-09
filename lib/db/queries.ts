@@ -69,7 +69,7 @@ export async function createUser(email: string, password: string) {
 }
 
 export async function createGuestUser() {
-  const email = `guest-${Date.now()}`;
+  const email = `guest-${generateUUID()}`;
   const password = generateHashedPassword(generateUUID());
 
   try {
@@ -795,4 +795,90 @@ export async function getSolvedChallengeIds({
     .where(eq(challengeProgress.userId, userId));
 
   return new Set(solved.map((s) => s.challengeId));
+}
+
+export async function transferGuestProgress({
+  guestUserId,
+  newUserId,
+}: {
+  guestUserId: string;
+  newUserId: string;
+}): Promise<{ transferred: number }> {
+  try {
+    return await db.transaction(async (tx) => {
+      // 1. Get guest's solved challenges
+      const guestProgress = await tx
+        .select({
+          id: challengeProgress.id,
+          challengeId: challengeProgress.challengeId,
+        })
+        .from(challengeProgress)
+        .where(eq(challengeProgress.userId, guestUserId));
+
+      if (guestProgress.length === 0) {
+        // No progress to transfer, just delete guest
+        await tx.delete(user).where(eq(user.id, guestUserId));
+        return { transferred: 0 };
+      }
+
+      // 2. Get new user's already-solved challenges to avoid conflicts
+      const newUserProgress = await tx
+        .select({ challengeId: challengeProgress.challengeId })
+        .from(challengeProgress)
+        .where(eq(challengeProgress.userId, newUserId));
+      const alreadySolved = new Set(newUserProgress.map((p) => p.challengeId));
+
+      // 3. Filter to non-conflicting progress
+      const toTransfer = guestProgress.filter(
+        (p) => !alreadySolved.has(p.challengeId)
+      );
+
+      if (toTransfer.length > 0) {
+        // 4. Transfer progress records
+        await tx
+          .update(challengeProgress)
+          .set({ userId: newUserId })
+          .where(
+            inArray(
+              challengeProgress.id,
+              toTransfer.map((p) => p.id)
+            )
+          );
+
+        // 5. Calculate points for transferred challenges
+        const pointsResult = await tx
+          .select({ points: sql<number>`COALESCE(SUM(${challenge.points}), 0)` })
+          .from(challengeProgress)
+          .innerJoin(challenge, eq(challengeProgress.challengeId, challenge.id))
+          .where(
+            inArray(
+              challengeProgress.id,
+              toTransfer.map((p) => p.id)
+            )
+          );
+
+        const transferredPoints = pointsResult[0]?.points ?? 0;
+
+        // 6. Update new user's stats
+        await tx
+          .update(user)
+          .set({
+            totalPoints: sql`${user.totalPoints} + ${transferredPoints}`,
+            solvedCount: sql`${user.solvedCount} + ${toTransfer.length}`,
+          })
+          .where(eq(user.id, newUserId));
+      }
+
+      // 7. Delete guest user (cascade will clean up any remaining records)
+      await tx.delete(user).where(eq(user.id, guestUserId));
+
+      return { transferred: toTransfer.length };
+    });
+  } catch (error) {
+    console.error("transferGuestProgress error:", error);
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to transfer guest progress"
+    );
+  }
 }

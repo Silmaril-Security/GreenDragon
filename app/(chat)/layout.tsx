@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DataStreamProvider } from "@/components/data-stream-provider";
+import { GuestBanner } from "@/components/guest-banner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "../(auth)/auth";
 
@@ -29,7 +30,10 @@ async function SidebarWrapper({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider defaultOpen={!isCollapsed}>
       <AppSidebar user={session?.user} />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        {session?.user?.type === "guest" && <GuestBanner />}
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }

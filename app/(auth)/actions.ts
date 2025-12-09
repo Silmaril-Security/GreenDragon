@@ -2,9 +2,9 @@
 
 import { z } from "zod";
 
-import { createUser, getUser } from "@/lib/db/queries";
+import { createUser, getUser, transferGuestProgress } from "@/lib/db/queries";
 
-import { signIn } from "./auth";
+import { auth, signIn } from "./auth";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -61,12 +61,29 @@ export const register = async (
       password: formData.get("password"),
     });
 
-    const [user] = await getUser(validatedData.email);
+    const [existingUser] = await getUser(validatedData.email);
 
-    if (user) {
+    if (existingUser) {
       return { status: "user_exists" } as RegisterActionState;
     }
+
+    // Check if current session is a guest before creating new user
+    const session = await auth();
+    const guestUserId = session?.user?.type === "guest" ? session.user.id : null;
+
     await createUser(validatedData.email, validatedData.password);
+
+    // Transfer guest progress to new account
+    if (guestUserId) {
+      const [newUser] = await getUser(validatedData.email);
+      if (newUser) {
+        await transferGuestProgress({
+          guestUserId,
+          newUserId: newUser.id,
+        });
+      }
+    }
+
     await signIn("credentials", {
       email: validatedData.email,
       password: validatedData.password,
