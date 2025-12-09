@@ -83,6 +83,7 @@ export function Chat({
   const [input, setInput] = useState<string>("");
   const [usage, setUsage] = useState<AppUsage | undefined>(initialLastContext);
   const [showCreditCardAlert, setShowCreditCardAlert] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const [currentModelId, setCurrentModelId] = useState(initialChatModel);
   const currentModelIdRef = useRef(currentModelId);
 
@@ -134,19 +135,20 @@ export function Chat({
       mutate(unstable_serialize(getChatHistoryPaginationKey));
     },
     onError: (error) => {
-      if (error instanceof ChatSDKError) {
-        // Check if it's a credit card error
-        if (
-          error.message?.includes("AI Gateway requires a valid credit card")
-        ) {
-          setShowCreditCardAlert(true);
-        } else {
-          toast({
-            type: "error",
-            description: error.message,
-          });
-        }
+      if (
+        error instanceof Error &&
+        error.message?.includes("AI Gateway requires a valid credit card")
+      ) {
+        setShowCreditCardAlert(true);
+        return;
       }
+
+      const message =
+        error instanceof ChatSDKError
+          ? error.message
+          : "Failed to generate response. Please try again.";
+
+      setGenerationError(message);
     },
   });
 
@@ -193,9 +195,15 @@ export function Chat({
 
         <Messages
           chatId={id}
+          generationError={generationError}
           isArtifactVisible={isArtifactVisible}
           isReadonly={isReadonly}
           messages={messages}
+          onDismissError={() => setGenerationError(null)}
+          onRetry={() => {
+            setGenerationError(null);
+            regenerate();
+          }}
           regenerate={regenerate}
           selectedModelId={initialChatModel}
           setMessages={setMessages}
@@ -208,8 +216,10 @@ export function Chat({
             <MultimodalInput
               attachments={attachments}
               chatId={id}
+              generationError={generationError}
               input={input}
               messages={messages}
+              onDismissError={() => setGenerationError(null)}
               onModelChange={setCurrentModelId}
               selectedModelId={currentModelId}
               selectedVisibilityType={visibilityType}

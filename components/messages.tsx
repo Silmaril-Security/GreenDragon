@@ -7,7 +7,7 @@ import type { Vote } from "@/lib/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import { useDataStream } from "./data-stream-provider";
 import { Greeting } from "./greeting";
-import { PreviewMessage, ThinkingMessage } from "./message";
+import { ErrorMessage, PreviewMessage, ThinkingMessage } from "./message";
 
 type MessagesProps = {
   chatId: string;
@@ -19,6 +19,9 @@ type MessagesProps = {
   isReadonly: boolean;
   isArtifactVisible: boolean;
   selectedModelId: string;
+  generationError: string | null;
+  onRetry: () => void;
+  onDismissError: () => void;
 };
 
 function PureMessages({
@@ -30,6 +33,9 @@ function PureMessages({
   regenerate,
   isReadonly,
   selectedModelId: _selectedModelId,
+  generationError,
+  onRetry,
+  onDismissError,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -74,7 +80,15 @@ function PureMessages({
             />
           ))}
 
-          {status === "submitted" && <ThinkingMessage />}
+          {status === "submitted" && !generationError && <ThinkingMessage />}
+
+          {generationError && (
+            <ErrorMessage
+              error={generationError}
+              onDismiss={onDismissError}
+              onRetry={onRetry}
+            />
+          )}
 
           <div
             className="min-h-[24px] min-w-[24px] shrink-0"

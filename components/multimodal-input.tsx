@@ -62,6 +62,8 @@ function PureMultimodalInput({
   selectedModelId,
   onModelChange,
   usage,
+  generationError,
+  onDismissError,
 }: {
   chatId: string;
   input: string;
@@ -78,6 +80,8 @@ function PureMultimodalInput({
   selectedModelId: string;
   onModelChange?: (modelId: string) => void;
   usage?: AppUsage;
+  generationError?: string | null;
+  onDismissError?: () => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -131,6 +135,8 @@ function PureMultimodalInput({
   const submitForm = useCallback(() => {
     window.history.pushState({}, "", `/chat/${chatId}`);
 
+    onDismissError?.();
+
     sendMessage({
       role: "user",
       parts: [
@@ -165,6 +171,7 @@ function PureMultimodalInput({
     width,
     chatId,
     resetHeight,
+    onDismissError,
   ]);
 
   const uploadFile = useCallback(async (file: File) => {
@@ -311,7 +318,7 @@ function PureMultimodalInput({
         className="rounded-xl border border-border bg-background p-3 shadow-xs transition-all duration-200 focus-within:border-border hover:border-muted-foreground/50"
         onSubmit={(event) => {
           event.preventDefault();
-          if (status !== "ready") {
+          if (status !== "ready" && !generationError) {
             toast.error("Please wait for the model to finish its response!");
           } else {
             submitForm();
@@ -371,6 +378,7 @@ function PureMultimodalInput({
           <PromptInputTools className="gap-0 sm:gap-0.5">
             <AttachmentsButton
               fileInputRef={fileInputRef}
+              generationError={generationError}
               selectedModelId={selectedModelId}
               status={status}
             />
@@ -428,10 +436,12 @@ function PureAttachmentsButton({
   fileInputRef,
   status,
   selectedModelId,
+  generationError,
 }: {
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
   status: UseChatHelpers<ChatMessage>["status"];
   selectedModelId: string;
+  generationError?: string | null;
 }) {
   const isReasoningModel = selectedModelId === "chat-model-reasoning";
 
@@ -439,7 +449,7 @@ function PureAttachmentsButton({
     <Button
       className="aspect-square h-8 rounded-lg p-1 transition-colors hover:bg-accent"
       data-testid="attachments-button"
-      disabled={status !== "ready" || isReasoningModel}
+      disabled={(status !== "ready" && !generationError) || isReasoningModel}
       onClick={(event) => {
         event.preventDefault();
         fileInputRef.current?.click();

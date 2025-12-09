@@ -1,10 +1,12 @@
 "use client";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import equal from "fast-deep-equal";
+import { AlertCircleIcon, RefreshCwIcon } from "lucide-react";
 import { memo, useState } from "react";
 import type { Vote } from "@/lib/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import { cn, sanitizeText } from "@/lib/utils";
+import { Button } from "./ui/button";
 import { useDataStream } from "./data-stream-provider";
 import { DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
@@ -316,6 +318,44 @@ export const ThinkingMessage = () => {
               <span className="animate-bounce [animation-delay:300ms]">.</span>
             </span>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ErrorMessage = ({
+  error,
+  onRetry,
+  onDismiss,
+}: {
+  error: string;
+  onRetry: () => void;
+  onDismiss: () => void;
+}) => {
+  return (
+    <div
+      className="group/message fade-in w-full animate-in duration-300"
+      data-role="assistant"
+      data-testid="message-error"
+    >
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-destructive bg-card p-4">
+        <span className="text-muted-foreground text-sm">
+          <span className="font-medium text-foreground">Error:</span> {error}
+        </span>
+        <div className="flex shrink-0 gap-2">
+          <Button onClick={onDismiss} size="sm" variant="ghost">
+            Dismiss
+          </Button>
+          <Button
+            className="gap-1.5"
+            onClick={onRetry}
+            size="sm"
+            variant="destructive"
+          >
+            <RefreshCwIcon className="size-3.5" />
+            Retry
+          </Button>
         </div>
       </div>
     </div>

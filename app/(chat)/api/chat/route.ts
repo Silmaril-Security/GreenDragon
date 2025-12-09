@@ -180,9 +180,10 @@ export async function POST(request: Request) {
     await createStreamId({ streamId, chatId: id });
 
     let finalMergedUsage: AppUsage | undefined;
+    let finalResponseText = "";
 
     const stream = createUIMessageStream({
-      execute: ({ writer: dataStream }) => {
+      execute: async ({ writer: dataStream }) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
           system: systemPrompt({ selectedChatModel, requestHints }),
@@ -212,76 +213,66 @@ export async function POST(request: Request) {
             functionId: "stream-text",
           },
           onFinish: async ({ usage, text }) => {
+            finalResponseText = text;
             try {
               const providers = await getTokenlensCatalog();
               const modelId =
                 myProvider.languageModel(selectedChatModel).modelId;
-              if (!modelId) {
+              if (!modelId || !providers) {
                 finalMergedUsage = usage;
-                dataStream.write({
-                  type: "data-usage",
-                  data: finalMergedUsage,
-                });
-              } else if (!providers) {
-                finalMergedUsage = usage;
-                dataStream.write({
-                  type: "data-usage",
-                  data: finalMergedUsage,
-                });
               } else {
                 const summary = getUsage({ modelId, usage, providers });
                 finalMergedUsage = { ...usage, ...summary, modelId } as AppUsage;
-                dataStream.write({ type: "data-usage", data: finalMergedUsage });
               }
+              dataStream.write({ type: "data-usage", data: finalMergedUsage });
             } catch (err) {
               console.warn("TokenLens enrichment failed", err);
               finalMergedUsage = usage;
               dataStream.write({ type: "data-usage", data: finalMergedUsage });
             }
-
-            // Validate response against unsolved challenges
-            if (session?.user?.id && text) {
-              try {
-                const [allChallenges, solvedIds] = await Promise.all([
-                  getChallenges(),
-                  getSolvedChallengeIds({ userId: session.user.id }),
-                ]);
-
-                for (const challenge of allChallenges) {
-                  if (solvedIds.has(challenge.id)) continue;
-
-                  const result = validateResponse(text, challenge);
-                  if (result.success) {
-                    await markChallengeSolved({
-                      userId: session.user.id,
-                      challengeId: challenge.id,
-                      points: challenge.points,
-                    });
-
-                    dataStream.write({
-                      type: "data-challengeSolved",
-                      data: {
-                        challengeId: challenge.id,
-                        title: challenge.title,
-                        points: challenge.points,
-                      },
-                    });
-                  }
-                }
-              } catch (err) {
-                console.warn("Challenge validation failed", err);
-              }
-            }
           },
         });
 
         result.consumeStream();
+        dataStream.merge(result.toUIMessageStream({ sendReasoning: true }));
 
-        dataStream.merge(
-          result.toUIMessageStream({
-            sendReasoning: true,
-          })
-        );
+        await result.text;
+
+        if (session?.user?.id && finalResponseText) {
+          try {
+            const [allChallenges, solvedIds] = await Promise.all([
+              getChallenges(),
+              getSolvedChallengeIds({ userId: session.user.id }),
+            ]);
+
+            for (const challenge of allChallenges) {
+              if (solvedIds.has(challenge.id)) continue;
+
+              const validationResult = validateResponse(
+                finalResponseText,
+                challenge
+              );
+              if (validationResult.success) {
+                await markChallengeSolved({
+                  userId: session.user.id,
+                  challengeId: challenge.id,
+                  points: challenge.points,
+                });
+
+                dataStream.write({
+                  type: "data-challengeSolved",
+                  data: {
+                    challengeId: challenge.id,
+                    title: challenge.title,
+                    points: challenge.points,
+                  },
+                });
+              }
+            }
+          } catch (err) {
+            console.warn("Challenge validation failed", err);
+          }
+        }
       },
       generateId: generateUUID,
       onFinish: async ({ messages }) => {
@@ -307,7 +298,8 @@ export async function POST(request: Request) {
           }
         }
       },
-      onError: () => {
+      onError: (error) => {
+        console.error("Stream error:", error);
         return "Oops, an error occurred!";
       },
     });
