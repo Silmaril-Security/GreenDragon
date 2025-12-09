@@ -85,11 +85,36 @@ CREATE TABLE IF NOT EXISTS "Vote" (
 	CONSTRAINT "Vote_chatId_messageId_pk" PRIMARY KEY("chatId","messageId")
 );
 --> statement-breakpoint
-ALTER TABLE "Chat" ADD COLUMN "title" text NOT NULL;--> statement-breakpoint
-ALTER TABLE "Chat" ADD COLUMN "visibility" varchar DEFAULT 'private' NOT NULL;--> statement-breakpoint
-ALTER TABLE "Chat" ADD COLUMN "lastContext" jsonb;--> statement-breakpoint
-ALTER TABLE "User" ADD COLUMN "totalPoints" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
-ALTER TABLE "User" ADD COLUMN "solvedCount" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "Chat" ADD COLUMN "title" text NOT NULL;
+EXCEPTION
+  WHEN duplicate_column THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "Chat" ADD COLUMN "visibility" varchar DEFAULT 'private' NOT NULL;
+EXCEPTION
+  WHEN duplicate_column THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "Chat" ADD COLUMN "lastContext" jsonb;
+EXCEPTION
+  WHEN duplicate_column THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "User" ADD COLUMN "totalPoints" integer DEFAULT 0 NOT NULL;
+EXCEPTION
+  WHEN duplicate_column THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "User" ADD COLUMN "solvedCount" integer DEFAULT 0 NOT NULL;
+EXCEPTION
+  WHEN duplicate_column THEN null;
+END $$;
+--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "ChallengeProgress" ADD CONSTRAINT "ChallengeProgress_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
