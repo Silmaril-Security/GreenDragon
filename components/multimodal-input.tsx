@@ -358,43 +358,35 @@ function PureMultimodalInput({
 
   return (
     <div className={cn("relative flex w-full flex-col gap-4", className)}>
-      {/* Header row with challenge info and Challenges link */}
-      <div className="flex items-center justify-between">
-        {/* Active challenge badge */}
-        {activeChallenge ? (
-          <ActiveChallengeBadge
-            title={activeChallenge.title}
-            difficulty={activeChallenge.difficulty}
-            points={activeChallenge.points}
-            onClear={clearActiveChallenge}
-          />
-        ) : (
-          /* Instruction prompt when no messages and no active challenge */
-          messages.length === 0 &&
-          attachments.length === 0 &&
-          uploadQueue.length === 0 &&
-          !showCommandPopover ? (
+      {/* Header row with challenge info and Challenges link - hidden when popover is open */}
+      {!showCommandPopover && (
+        <div className="flex items-center justify-between">
+          {/* Active challenge badge or instruction prompt */}
+          {activeChallenge ? (
+            <ActiveChallengeBadge
+              title={activeChallenge.title}
+              difficulty={activeChallenge.difficulty}
+              points={activeChallenge.points}
+              onClear={clearActiveChallenge}
+            />
+          ) : (
             <div className="flex items-center gap-2 text-muted-foreground">
               <TerminalIcon className="size-4 text-emerald-500 dark:text-emerald-400" />
               <span className="text-sm">
                 <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-mono font-semibold text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">/activate</span> to select a challenge
               </span>
             </div>
-          ) : (
-            <div />
-          )
-        )}
+          )}
 
-        {/* Challenges link - hidden during challenge selection */}
-        {!showCommandPopover && (
+          {/* Challenges link */}
           <Link
             href="/challenges"
             className="text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             Challenges
           </Link>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Command popover */}
       <CommandPopover

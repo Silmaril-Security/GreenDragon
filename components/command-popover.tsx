@@ -1,8 +1,8 @@
 "use client";
 
 import { Command } from "cmdk";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { difficultyConfig, type Difficulty } from "@/lib/challenges/data";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { difficultyConfig, categoryConfig, type Difficulty, type Category } from "@/lib/challenges/data";
 import type { Challenge } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,15 @@ interface CommandPopoverProps {
   challenges: Challenge[];
   searchQuery: string;
   anchorRef: React.RefObject<HTMLElement | null>;
+}
+
+// Parse description into quote and body parts
+function parseDescription(description: string): { quote: string | null; body: string } {
+  const quoteMatch = description.match(/^["'](.+?)["']\s*\n\n(.+)$/s);
+  if (quoteMatch) {
+    return { quote: quoteMatch[1], body: quoteMatch[2] };
+  }
+  return { quote: null, body: description };
 }
 
 // Highlight matching text in a string
@@ -54,6 +63,8 @@ function PureCommandPopover({
   searchQuery,
 }: CommandPopoverProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const listRef = useRef<HTMLDivElement>(null);
 
   const filteredChallenges = useMemo(() => {
     if (!searchQuery) return challenges;
@@ -86,6 +97,17 @@ function PureCommandPopover({
   useEffect(() => {
     setSelectedIndex(0);
   }, [filteredChallenges.length]);
+
+  // Scroll selected item into view
+  useEffect(() => {
+    const selectedElement = itemRefs.current.get(selectedIndex);
+    if (selectedElement) {
+      selectedElement.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [selectedIndex]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -127,14 +149,14 @@ function PureCommandPopover({
   if (!open) return null;
 
   return (
-    <div className="absolute bottom-full left-0 z-50 mb-2 w-full max-w-md">
+    <div className="absolute bottom-full left-0 z-50 mb-1 w-full max-w-md">
       <Command className="overflow-hidden rounded-lg border bg-popover shadow-lg">
         <div className="border-b px-3 py-2">
           <p className="text-xs text-muted-foreground">
             Select a challenge to activate
           </p>
         </div>
-        <Command.List className="max-h-64 overflow-y-auto p-1">
+        <Command.List ref={listRef} className="max-h-64 overflow-y-auto p-1">
           {filteredChallenges.length === 0 ? (
             <Command.Empty className="px-3 py-6 text-center text-sm text-muted-foreground">
               No challenges found
@@ -142,48 +164,73 @@ function PureCommandPopover({
           ) : (
             filteredChallenges.map((challenge, index) => {
               const diffConfig = difficultyConfig[challenge.difficulty as Difficulty];
+              const catConfig = categoryConfig[challenge.category as Category];
               const isSelected = index === selectedIndex;
+              const { quote, body } = parseDescription(challenge.description);
 
               return (
-                <Command.Item
+                <div
                   key={challenge.id}
-                  value={challenge.slug}
-                  onSelect={() => onSelect(challenge)}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                    isSelected
-                      ? "bg-accent text-accent-foreground"
-                      : "hover:bg-accent/50"
-                  )}
+                  ref={(el) => {
+                    if (el) itemRefs.current.set(index, el);
+                    else itemRefs.current.delete(index);
+                  }}
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate font-medium">
-                        <HighlightedText
-                          text={challenge.title}
-                          query={searchQuery}
-                        />
-                      </span>
-                      <span
-                        className={cn(
-                          "shrink-0 text-[10px] font-medium",
-                          diffConfig?.color
+                  <Command.Item
+                    value={challenge.slug}
+                    onSelect={() => onSelect(challenge)}
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-md px-3 py-2 text-sm transition-all duration-200",
+                      isSelected
+                        ? "bg-accent text-accent-foreground"
+                        : "hover:bg-accent/50"
+                    )}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate font-medium">
+                          <HighlightedText
+                            text={challenge.title}
+                            query={searchQuery}
+                          />
+                        </span>
+                        <span className="shrink-0 text-[10px] text-muted-foreground">
+                          {catConfig?.label ?? challenge.category}
+                        </span>
+                        <span
+                          className={cn(
+                            "shrink-0 text-[10px] font-medium",
+                            diffConfig?.color
+                          )}
+                        >
+                          {diffConfig?.label}
+                        </span>
+                      </div>
+                      <div className={cn(
+                        "overflow-hidden transition-all duration-200",
+                        isSelected ? "max-h-40 opacity-100" : "max-h-5 opacity-80"
+                      )}>
+                        {isSelected ? (
+                          // Selected: show quote and full description
+                          <div className="text-xs text-muted-foreground">
+                            {quote && (
+                              <p className="italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+                            )}
+                            <p className="mt-0.5">{body}</p>
+                          </div>
+                        ) : (
+                          // Not selected: show just the quote, truncated
+                          <p className="truncate text-xs italic text-muted-foreground">
+                            &ldquo;{quote ?? body}&rdquo;
+                          </p>
                         )}
-                      >
-                        {diffConfig?.label}
-                      </span>
+                      </div>
                     </div>
-                    <p className="truncate text-xs text-muted-foreground">
-                      <HighlightedText
-                        text={challenge.description}
-                        query={searchQuery}
-                      />
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {challenge.points} pts
-                  </span>
-                </Command.Item>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {challenge.points} pts
+                    </span>
+                  </Command.Item>
+                </div>
               );
             })
           )}

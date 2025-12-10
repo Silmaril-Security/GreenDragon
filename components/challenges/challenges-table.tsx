@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,60 @@ import {
   categoryConfig,
   statusConfig,
 } from "@/lib/challenges/data";
+
+// Parse description into quote and body parts
+function parseDescription(description: string): { quote: string | null; body: string } {
+  // Match quoted text at the start: "..." or '...'
+  const quoteMatch = description.match(/^["'](.+?)["']\s*\n\n(.+)$/s);
+  if (quoteMatch) {
+    return { quote: quoteMatch[1], body: quoteMatch[2] };
+  }
+  return { quote: null, body: description };
+}
+
+function ChallengeDescription({
+  description,
+  variant = "full"
+}: {
+  description: string;
+  variant?: "full" | "compact" | "mobile";
+}) {
+  const { quote, body } = useMemo(() => parseDescription(description), [description]);
+
+  if (variant === "compact") {
+    // Desktop: show quote and body
+    return (
+      <div className="text-xs text-muted-foreground">
+        {quote && (
+          <p className="italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+        )}
+        <p className="mt-0.5 line-clamp-2">{body}</p>
+      </div>
+    );
+  }
+
+  if (variant === "mobile") {
+    // Mobile: show quote and truncated body
+    return (
+      <div className="text-xs text-muted-foreground">
+        {quote && (
+          <p className="italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+        )}
+        <p className="mt-1 line-clamp-2">{body}</p>
+      </div>
+    );
+  }
+
+  // Full: show everything
+  return (
+    <div className="text-sm text-muted-foreground">
+      {quote && (
+        <p className="mb-2 italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+      )}
+      <p>{body}</p>
+    </div>
+  );
+}
 
 export type SortField = "status" | "title" | "difficulty" | "points";
 export type SortDirection = "asc" | "desc";
@@ -162,10 +217,10 @@ export function ChallengesTable({
                     </span>
                     <div className="flex-1">
                       <div className="font-medium">{challenge.title}</div>
-                      <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                        {challenge.description}
+                      <div className="mt-1">
+                        <ChallengeDescription description={challenge.description} variant="mobile" />
                       </div>
-                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                         <span className="text-muted-foreground">
                           {catConfig?.label ?? challenge.category}
                         </span>
@@ -193,8 +248,8 @@ export function ChallengesTable({
                     </span>
                     <div>
                       <div className="font-medium">{challenge.title}</div>
-                      <div className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                        {challenge.description}
+                      <div className="mt-0.5">
+                        <ChallengeDescription description={challenge.description} variant="compact" />
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground">
