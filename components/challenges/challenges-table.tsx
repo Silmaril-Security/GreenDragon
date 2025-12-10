@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useActiveChallenge } from "@/contexts/active-challenge-context";
 import {
   type Challenge,
   difficultyConfig,
@@ -76,9 +77,11 @@ export function ChallengesTable({
   onPageChange,
 }: ChallengesTableProps) {
   const router = useRouter();
+  const { setActiveChallenge } = useActiveChallenge();
 
   const handleRowClick = (challenge: Challenge) => {
-    router.push(`/?challenge=${challenge.id}`);
+    setActiveChallenge(challenge);
+    router.push("/");
   };
 
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * 10 + 1;

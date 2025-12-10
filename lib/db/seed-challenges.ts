@@ -70,6 +70,51 @@ async function seed() {
     `;
   }
 
+  // Remove challenges that are no longer in the list
+  const slugsInCode = challenges.map((c) => c.slug);
+
+  const deleted = await sql`
+    DELETE FROM "Challenge"
+    WHERE slug NOT IN ${sql(slugsInCode)}
+    RETURNING slug, title
+  `;
+
+  if (deleted.length > 0) {
+    console.log(`\nRemoved ${deleted.length} orphaned challenge(s):`);
+    for (const d of deleted) {
+      console.log(`  ✗ ${d.title} (${d.slug})`);
+    }
+
+    // Recalculate user stats since ChallengeProgress records were cascade deleted
+    console.log("\nRecalculating user stats...");
+    await sql`
+      UPDATE "User" u
+      SET
+        "totalPoints" = COALESCE(stats.total_points, 0),
+        "solvedCount" = COALESCE(stats.solved_count, 0)
+      FROM (
+        SELECT
+          cp."userId",
+          SUM(c.points) as total_points,
+          COUNT(*) as solved_count
+        FROM "ChallengeProgress" cp
+        JOIN "Challenge" c ON c.id = cp."challengeId"
+        GROUP BY cp."userId"
+      ) stats
+      WHERE u.id = stats."userId"
+    `;
+
+    // Reset stats for users with no remaining progress
+    await sql`
+      UPDATE "User"
+      SET "totalPoints" = 0, "solvedCount" = 0
+      WHERE id NOT IN (SELECT DISTINCT "userId" FROM "ChallengeProgress")
+        AND ("totalPoints" > 0 OR "solvedCount" > 0)
+    `;
+
+    console.log("User stats recalculated.");
+  }
+
   const result = await sql`
     SELECT slug, title, points, "isActive"
     FROM "Challenge"

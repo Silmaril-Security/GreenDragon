@@ -35,7 +35,7 @@ export function SocialLinks() {
             variant="outline"
             className="h-8 px-2 md:h-fit md:px-2"
             onClick={async () => {
-              await copyToClipboard(window.location.href);
+              await copyToClipboard(window.location.origin);
               toast.success("Link copied to clipboard!");
             }}
           >

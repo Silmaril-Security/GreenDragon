@@ -4,6 +4,8 @@ import type { UseChatHelpers } from "@ai-sdk/react";
 import { Trigger } from "@radix-ui/react-select";
 import type { UIMessage } from "ai";
 import equal from "fast-deep-equal";
+import { Terminal as TerminalIcon } from "lucide-react";
+import Link from "next/link";
 import {
   type ChangeEvent,
   type Dispatch,
@@ -20,10 +22,16 @@ import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
 import { saveChatModelAsCookie } from "@/app/(chat)/actions";
 import { SelectItem } from "@/components/ui/select";
+import { useActiveChallenge } from "@/contexts/active-challenge-context";
+import { useChallenges } from "@/hooks/use-challenges";
 import { chatModels } from "@/lib/ai/models";
+import type { Category, Difficulty } from "@/lib/challenges/data";
+import type { Challenge } from "@/lib/db/schema";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import type { AppUsage } from "@/lib/usage";
 import { cn } from "@/lib/utils";
+import { ActiveChallengeBadge } from "./active-challenge-badge";
+import { CommandPopover } from "./command-popover";
 import { Context } from "./elements/context";
 import {
   PromptInput,
@@ -42,7 +50,6 @@ import {
   StopIcon,
 } from "./icons";
 import { PreviewAttachment } from "./preview-attachment";
-import { SuggestedActions } from "./suggested-actions";
 import { Button } from "./ui/button";
 import type { VisibilityType } from "./visibility-selector";
 
@@ -85,6 +92,56 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+
+  // Active challenge and command popover state
+  const { activeChallenge, setActiveChallenge, clearActiveChallenge } =
+    useActiveChallenge();
+  const { challenges } = useChallenges();
+  const [showCommandPopover, setShowCommandPopover] = useState(false);
+
+  // Parse slash command from input
+  const commandMatch = useMemo(() => {
+    // Any input starting with / triggers command mode
+    if (!input.startsWith("/")) return null;
+
+    // Match /activate with optional search query
+    const fullMatch = input.match(/^\/activate\s+(.*)/i);
+    if (fullMatch) {
+      return { command: "activate", query: fullMatch[1] || "" };
+    }
+
+    // Match exact /activate (no space yet)
+    if (/^\/activate$/i.test(input)) {
+      return { command: "activate", query: "" };
+    }
+
+    // For anything else starting with /, treat the text after / as a search query
+    // This allows typing /ad to search for "ad" in challenge names
+    const searchQuery = input.slice(1); // Remove the leading /
+    return { command: "search", query: searchQuery };
+  }, [input]);
+
+  // Show command popover when typing /activate
+  useEffect(() => {
+    setShowCommandPopover(!!commandMatch);
+  }, [commandMatch]);
+
+  const handleSelectChallenge = useCallback(
+    (challenge: Challenge) => {
+      setActiveChallenge({
+        id: challenge.id,
+        title: challenge.title,
+        description: challenge.description,
+        category: challenge.category as Category,
+        difficulty: challenge.difficulty as Difficulty,
+        points: challenge.points,
+        status: "not-started",
+      });
+      setInput("");
+      setShowCommandPopover(false);
+    },
+    [setActiveChallenge, setInput]
+  );
 
   const adjustHeight = useCallback(() => {
     if (textareaRef.current) {
@@ -133,6 +190,11 @@ function PureMultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<string[]>([]);
 
   const submitForm = useCallback(() => {
+    // Don't submit if it's a command
+    if (commandMatch) {
+      return;
+    }
+
     window.history.pushState({}, "", `/chat/${chatId}`);
 
     onDismissError?.();
@@ -172,6 +234,7 @@ function PureMultimodalInput({
     chatId,
     resetHeight,
     onDismissError,
+    commandMatch,
   ]);
 
   const uploadFile = useCallback(async (file: File) => {
@@ -295,15 +358,56 @@ function PureMultimodalInput({
 
   return (
     <div className={cn("relative flex w-full flex-col gap-4", className)}>
-      {messages.length === 0 &&
-        attachments.length === 0 &&
-        uploadQueue.length === 0 && (
-          <SuggestedActions
-            chatId={chatId}
-            selectedVisibilityType={selectedVisibilityType}
-            sendMessage={sendMessage}
+      {/* Header row with challenge info and Challenges link */}
+      <div className="flex items-center justify-between">
+        {/* Active challenge badge */}
+        {activeChallenge ? (
+          <ActiveChallengeBadge
+            title={activeChallenge.title}
+            difficulty={activeChallenge.difficulty}
+            points={activeChallenge.points}
+            onClear={clearActiveChallenge}
           />
+        ) : (
+          /* Instruction prompt when no messages and no active challenge */
+          messages.length === 0 &&
+          attachments.length === 0 &&
+          uploadQueue.length === 0 &&
+          !showCommandPopover ? (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <TerminalIcon className="size-4 text-emerald-500 dark:text-emerald-400" />
+              <span className="text-sm">
+                <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-mono font-semibold text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">/activate</span> to select a challenge
+              </span>
+            </div>
+          ) : (
+            <div />
+          )
         )}
+
+        {/* Challenges link - hidden during challenge selection */}
+        {!showCommandPopover && (
+          <Link
+            href="/challenges"
+            className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Challenges
+          </Link>
+        )}
+      </div>
+
+      {/* Command popover */}
+      <CommandPopover
+        open={showCommandPopover}
+        onClose={() => {
+          setShowCommandPopover(false);
+          setInput("");
+        }}
+        onSelect={handleSelectChallenge}
+        challenges={challenges}
+        searchQuery={commandMatch?.query || ""}
+        anchorRef={textareaRef}
+      />
 
       <input
         className="-top-4 -left-4 pointer-events-none fixed size-0.5 opacity-0"

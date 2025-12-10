@@ -30,11 +30,11 @@ import { isProductionEnvironment } from "@/lib/constants";
 import {
   createStreamId,
   deleteChatById,
+  getChallengeById,
   getChatById,
-  getChallenges,
   getMessageCountByUserId,
   getMessagesByChatId,
-  getSolvedChallengeIds,
+  isChallengeSolved,
   markChallengeSolved,
   saveChat,
   saveMessages,
@@ -105,11 +105,13 @@ export async function POST(request: Request) {
       message,
       selectedChatModel,
       selectedVisibilityType,
+      activeChallengeId,
     }: {
       id: string;
       message: ChatMessage;
       selectedChatModel: ChatModel["id"];
       selectedVisibilityType: VisibilityType;
+      activeChallengeId?: string;
     } = requestBody;
 
     const session = await auth();
@@ -163,6 +165,11 @@ export async function POST(request: Request) {
       country,
     };
 
+    // Fetch active challenge if provided
+    const activeChallenge = activeChallengeId
+      ? await getChallengeById({ id: activeChallengeId })
+      : null;
+
     await saveMessages({
       messages: [
         {
@@ -186,7 +193,11 @@ export async function POST(request: Request) {
       execute: async ({ writer: dataStream }) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
+          system: systemPrompt({
+            selectedChatModel,
+            requestHints,
+            challengePrompt: activeChallenge?.systemPrompt,
+          }),
           messages: convertToModelMessages(uiMessages),
           stopWhen: stepCountIs(5),
           experimental_activeTools:
@@ -238,33 +249,34 @@ export async function POST(request: Request) {
 
         await result.text;
 
-        if (session?.user?.id && finalResponseText) {
+        // Only validate against active challenge (optimized)
+        if (session?.user?.id && finalResponseText && activeChallenge) {
           try {
-            const [allChallenges, solvedIds] = await Promise.all([
-              getChallenges(),
-              getSolvedChallengeIds({ userId: session.user.id }),
-            ]);
+            // Check if already solved
+            const alreadySolved = await isChallengeSolved({
+              userId: session.user.id,
+              challengeId: activeChallenge.id,
+            });
 
-            for (const challenge of allChallenges) {
-              if (solvedIds.has(challenge.id)) continue;
-
+            if (!alreadySolved) {
               const validationResult = validateResponse(
                 finalResponseText,
-                challenge
+                activeChallenge
               );
+
               if (validationResult.success) {
                 await markChallengeSolved({
                   userId: session.user.id,
-                  challengeId: challenge.id,
-                  points: challenge.points,
+                  challengeId: activeChallenge.id,
+                  points: activeChallenge.points,
                 });
 
                 dataStream.write({
                   type: "data-challengeSolved",
                   data: {
-                    challengeId: challenge.id,
-                    title: challenge.title,
-                    points: challenge.points,
+                    challengeId: activeChallenge.id,
+                    title: activeChallenge.title,
+                    points: activeChallenge.points,
                   },
                 });
               }

@@ -33,7 +33,7 @@ Do not update document right after creating it. Wait for user feedback or reques
 `;
 
 export const regularPrompt =
-  "You are a friendly assistant! Keep your responses concise and helpful.";
+  "You are Lorien, an AI assistant designed by Silmaril to showcase AI risks. Keep your responses concise and helpful.";
 
 export type RequestHints = {
   latitude: Geo["latitude"];
@@ -53,17 +53,24 @@ About the origin of user's request:
 export const systemPrompt = ({
   selectedChatModel,
   requestHints,
+  challengePrompt,
 }: {
   selectedChatModel: string;
   requestHints: RequestHints;
+  challengePrompt?: string | null;
 }) => {
   const requestPrompt = getRequestPromptFromHints(requestHints);
 
-  if (selectedChatModel === "chat-model-reasoning") {
-    return `${regularPrompt}\n\n${requestPrompt}`;
+  let basePrompt = regularPrompt;
+  if (challengePrompt) {
+    basePrompt += `\n\n${challengePrompt}`;
   }
 
-  return `${regularPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
+  if (selectedChatModel === "chat-model-reasoning") {
+    return `${basePrompt}\n\n${requestPrompt}`;
+  }
+
+  return `${basePrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
 };
 
 export const codePrompt = `
