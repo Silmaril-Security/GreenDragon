@@ -158,7 +158,7 @@ export function ChallengesTable({
                             : "text-muted-foreground"
                       )}
                     >
-                      {statConfig.icon}
+                      {statConfig?.icon ?? "○"}
                     </span>
                     <div className="flex-1">
                       <div className="font-medium">{challenge.title}</div>
@@ -167,9 +167,9 @@ export function ChallengesTable({
                       </div>
                       <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
                         <span className="text-muted-foreground">
-                          {catConfig.label}
+                          {catConfig?.label ?? challenge.category}
                         </span>
-                        <span className={diffConfig.color}>{diffConfig.label}</span>
+                        <span className={diffConfig?.color}>{diffConfig?.label ?? challenge.difficulty}</span>
                         <span className="text-muted-foreground">
                           {challenge.points} pts
                         </span>
@@ -189,7 +189,7 @@ export function ChallengesTable({
                             : "text-muted-foreground"
                       )}
                     >
-                      {statConfig.icon}
+                      {statConfig?.icon ?? "○"}
                     </span>
                     <div>
                       <div className="font-medium">{challenge.title}</div>
@@ -198,10 +198,10 @@ export function ChallengesTable({
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {catConfig.label}
+                      {catConfig?.label ?? challenge.category}
                     </div>
-                    <div className={cn("text-sm", diffConfig.color)}>
-                      {diffConfig.label}
+                    <div className={cn("text-sm", diffConfig?.color)}>
+                      {diffConfig?.label ?? challenge.difficulty}
                     </div>
                     <div className="text-right text-sm">{challenge.points}</div>
                   </div>

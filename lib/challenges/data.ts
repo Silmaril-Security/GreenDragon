@@ -2,6 +2,9 @@ export type Difficulty = "novice" | "easy" | "medium" | "hard" | "nightmare";
 
 export type Category =
   | "prompt-injection"
+  | "indirect-prompt-injection"
+  | "excessive-agency"
+  | "insecure-plugin-design"
   | "jailbreaking"
   | "rag-exploits"
   | "agent-attacks"
@@ -60,6 +63,9 @@ export const difficultyConfig: Record<
 
 export const categoryConfig: Record<Category, { label: string }> = {
   "prompt-injection": { label: "Prompt Injection" },
+  "indirect-prompt-injection": { label: "Indirect Prompt Injection" },
+  "excessive-agency": { label: "Excessive Agency" },
+  "insecure-plugin-design": { label: "Insecure Plugin Design" },
   jailbreaking: { label: "Jailbreaking" },
   "rag-exploits": { label: "RAG Exploits" },
   "agent-attacks": { label: "Agent Attacks" },
