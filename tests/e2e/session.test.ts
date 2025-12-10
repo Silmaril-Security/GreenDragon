@@ -45,7 +45,7 @@ test.describe
       await expect(userNavMenu).toBeVisible();
 
       const authMenuItem = page.getByTestId("user-nav-item-auth");
-      await expect(authMenuItem).toContainText("Login to your account");
+      await expect(authMenuItem).toContainText("Sign in to your account");
     });
 
     test("Do not authenticate as guest user when an existing non-guest session is active", async ({
@@ -69,16 +69,16 @@ test.describe
       expect(chain).toEqual(["http://localhost:3000/"]);
     });
 
-    test("Allow navigating to /login as guest user", async ({ page }) => {
-      await page.goto("/login");
-      await page.waitForURL("/login");
-      await expect(page).toHaveURL("/login");
+    test("Allow navigating to /sign-in as guest user", async ({ page }) => {
+      await page.goto("/sign-in");
+      await page.waitForURL("/sign-in");
+      await expect(page).toHaveURL("/sign-in");
     });
 
-    test("Allow navigating to /register as guest user", async ({ page }) => {
-      await page.goto("/register");
-      await page.waitForURL("/register");
-      await expect(page).toHaveURL("/register");
+    test("Allow navigating to /sign-up as guest user", async ({ page }) => {
+      await page.goto("/sign-up");
+      await page.waitForURL("/sign-up");
+      await expect(page).toHaveURL("/sign-up");
     });
 
     test("Do not show email in user menu for guest user", async ({ page }) => {
@@ -93,7 +93,7 @@ test.describe
   });
 
 test.describe
-  .serial("Login and Registration", () => {
+  .serial("Sign In and Sign Up", () => {
     let authPage: AuthPage;
 
     const testUser = generateRandomTestUser();
@@ -102,25 +102,25 @@ test.describe
       authPage = new AuthPage(page);
     });
 
-    test("Register new account", async () => {
-      await authPage.register(testUser.email, testUser.password);
+    test("Sign up new account", async () => {
+      await authPage.signUp(testUser.email, testUser.password);
       await authPage.expectToastToContain("Account created successfully!");
     });
 
-    test("Register new account with existing email", async () => {
-      await authPage.register(testUser.email, testUser.password);
+    test("Sign up with existing email", async () => {
+      await authPage.signUp(testUser.email, testUser.password);
       await authPage.expectToastToContain("Account already exists!");
     });
 
-    test("Log into account that exists", async ({ page }) => {
-      await authPage.login(testUser.email, testUser.password);
+    test("Sign in to account that exists", async ({ page }) => {
+      await authPage.signIn(testUser.email, testUser.password);
 
       await page.waitForURL("/");
       await expect(page.getByPlaceholder("Send a message...")).toBeVisible();
     });
 
     test("Display user email in user menu", async ({ page }) => {
-      await authPage.login(testUser.email, testUser.password);
+      await authPage.signIn(testUser.email, testUser.password);
 
       await page.waitForURL("/");
       await expect(page.getByPlaceholder("Send a message...")).toBeVisible();
@@ -129,14 +129,14 @@ test.describe
       await expect(userEmail).toHaveText(testUser.email);
     });
 
-    test("Log out as non-guest user", async () => {
-      await authPage.logout(testUser.email, testUser.password);
+    test("Sign out as non-guest user", async () => {
+      await authPage.signOut(testUser.email, testUser.password);
     });
 
     test("Do not force create a guest session if non-guest session already exists", async ({
       page,
     }) => {
-      await authPage.login(testUser.email, testUser.password);
+      await authPage.signIn(testUser.email, testUser.password);
       await page.waitForURL("/");
 
       const userEmail = await page.getByTestId("user-email");
@@ -149,8 +149,8 @@ test.describe
       await expect(updatedUserEmail).toHaveText(testUser.email);
     });
 
-    test("Log out is available for non-guest users", async ({ page }) => {
-      await authPage.login(testUser.email, testUser.password);
+    test("Sign out is available for non-guest users", async ({ page }) => {
+      await authPage.signIn(testUser.email, testUser.password);
       await page.waitForURL("/");
 
       authPage.openSidebar();
@@ -166,21 +166,21 @@ test.describe
       await expect(authMenuItem).toContainText("Sign out");
     });
 
-    test("Do not navigate to /register for non-guest users", async ({
+    test("Do not navigate to /sign-up for non-guest users", async ({
       page,
     }) => {
-      await authPage.login(testUser.email, testUser.password);
+      await authPage.signIn(testUser.email, testUser.password);
       await page.waitForURL("/");
 
-      await page.goto("/register");
+      await page.goto("/sign-up");
       await expect(page).toHaveURL("/");
     });
 
-    test("Do not navigate to /login for non-guest users", async ({ page }) => {
-      await authPage.login(testUser.email, testUser.password);
+    test("Do not navigate to /sign-in for non-guest users", async ({ page }) => {
+      await authPage.signIn(testUser.email, testUser.password);
       await page.waitForURL("/");
 
-      await page.goto("/login");
+      await page.goto("/sign-in");
       await expect(page).toHaveURL("/");
     });
   });

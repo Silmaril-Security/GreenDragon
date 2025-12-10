@@ -15,8 +15,8 @@ export function GuestBanner() {
       <div className="flex items-center gap-3 rounded-lg border bg-background px-4 py-2 shadow-lg">
         <p className="text-sm text-muted-foreground">
           Playing as guest.{" "}
-          <Link href="/register" className="font-medium text-foreground underline underline-offset-4 hover:no-underline">
-            Register
+          <Link href="/sign-up" className="font-medium text-foreground underline underline-offset-4 hover:no-underline">
+            Sign up
           </Link>{" "}
           to claim your progress.
         </p>

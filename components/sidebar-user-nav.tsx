@@ -8,13 +8,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { guestRegex } from "@/lib/constants";
 import { LoaderIcon } from "./icons";
 
 export function SidebarUserNav({ user }: { user: User }) {
   const { data, status } = useSession();
 
-  const isGuest = guestRegex.test(data?.user?.email ?? "");
+  const isGuest = data?.user?.type === "guest";
 
   return (
     <SidebarMenu>

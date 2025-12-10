@@ -6,7 +6,7 @@ import { ProfileContent } from "@/components/profile/profile-content";
 
 export default async function ProfilePage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/sign-in");
 
   const [[user], challenges, leaderboard] = await Promise.all([
     getUser(session.user.email!),

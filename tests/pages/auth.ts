@@ -8,18 +8,18 @@ export class AuthPage {
     this.page = page;
   }
 
-  async gotoLogin() {
-    await this.page.goto("/login");
+  async gotoSignIn() {
+    await this.page.goto("/sign-in");
     await expect(this.page.getByRole("heading")).toContainText("Sign In");
   }
 
-  async gotoRegister() {
-    await this.page.goto("/register");
+  async gotoSignUp() {
+    await this.page.goto("/sign-up");
     await expect(this.page.getByRole("heading")).toContainText("Sign Up");
   }
 
-  async register(email: string, password: string) {
-    await this.gotoRegister();
+  async signUp(email: string, password: string) {
+    await this.gotoSignUp();
     await this.page.getByPlaceholder("user@acme.com").click();
     await this.page.getByPlaceholder("user@acme.com").fill(email);
     await this.page.getByLabel("Password").click();
@@ -27,8 +27,8 @@ export class AuthPage {
     await this.page.getByRole("button", { name: "Sign Up" }).click();
   }
 
-  async login(email: string, password: string) {
-    await this.gotoLogin();
+  async signIn(email: string, password: string) {
+    await this.gotoSignIn();
     await this.page.getByPlaceholder("user@acme.com").click();
     await this.page.getByPlaceholder("user@acme.com").fill(email);
     await this.page.getByLabel("Password").click();
@@ -36,8 +36,8 @@ export class AuthPage {
     await this.page.getByRole("button", { name: "Sign In" }).click();
   }
 
-  async logout(email: string, password: string) {
-    await this.login(email, password);
+  async signOut(email: string, password: string) {
+    await this.signIn(email, password);
     await this.page.waitForURL("/");
 
     await this.openSidebar();

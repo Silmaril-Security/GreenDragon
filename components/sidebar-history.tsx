@@ -115,7 +115,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
       <SidebarGroup>
         <SidebarGroupContent>
           <div className="flex w-full flex-row items-center justify-center gap-2 px-2 text-sm text-zinc-500">
-            Login to save and revisit previous chats!
+            Sign in to save and revisit previous chats!
           </div>
         </SidebarGroupContent>
       </SidebarGroup>

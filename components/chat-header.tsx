@@ -110,7 +110,7 @@ function PureChatHeader({
       <div className="order-3 ml-auto flex items-center gap-2">
         {isGuest && (
           <Button asChild size="sm">
-            <Link href="/register">Register</Link>
+            <Link href="/sign-up">Sign Up</Link>
           </Button>
         )}
         <SocialLinks />
