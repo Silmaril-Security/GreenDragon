@@ -7,9 +7,30 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://chat.vercel.ai"),
+  metadataBase: new URL("https://greendragon.vercel.app"),
   title: "Green Dragon | Silmaril",
-  description: "Silmaril Green Dragon AI assistant.",
+  description:
+    "The most advanced open-source AI security challenge platform. Solve hyper-realistic security challenges, earn points, and start your white-hat AI hacker journey.",
+  openGraph: {
+    title: "Green Dragon | Silmaril",
+    description:
+      "The most advanced open-source AI security challenge platform. Solve hyper-realistic security challenges, earn points, and start your white-hat AI hacker journey.",
+    url: "https://greendragon.vercel.app",
+    siteName: "Green Dragon",
+    locale: "en_US",
+    type: "website",
+    images: ["/green-dragon.jpeg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Green Dragon | Silmaril",
+    description:
+      "The most advanced open-source AI security challenge platform. Solve hyper-realistic security challenges, earn points, and start your white-hat AI hacker journey.",
+    images: ["/green-dragon.jpeg"],
+  },
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export const viewport = {
