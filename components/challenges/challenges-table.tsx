@@ -45,13 +45,13 @@ function ChallengeDescription({
   }
 
   if (variant === "mobile") {
-    // Mobile: show quote and truncated body
+    // Mobile: show quote and full body
     return (
       <div className="text-xs text-muted-foreground">
         {quote && (
           <p className="italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
         )}
-        <p className="mt-1 line-clamp-2">{body}</p>
+        <p className="mt-1">{body}</p>
       </div>
     );
   }

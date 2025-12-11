@@ -254,6 +254,44 @@ When proposing a feature:
   /routes            - API route tests
 ```
 
+## Adding New Challenges
+
+Challenges are defined in `lib/db/seed-challenges.ts`. Each challenge requires:
+
+- `slug` - URL-friendly identifier (unique, used for upsert)
+- `title` - Display name
+- `description` - Challenge description (can include quoted text)
+- `category` - One of: prompt-injection, indirect-prompt-injection, excessive-agency, insecure-plugin-design, jailbreaking, rag-exploits, agent-attacks, model-theft, adversarial-ml, data-poisoning, evasion
+- `difficulty` - novice, easy, medium, hard, nightmare
+- `points` - Points awarded for completion
+- `successType` - How to detect success (see below)
+- `successValue` - Pattern to match in AI response
+- `systemPrompt` - Challenge-specific AI instructions
+- `sortOrder` - Display order (lower = first)
+- `isActive` - Whether challenge is visible
+
+### Success Types
+
+- `response_contains` - AI response must contain the value (case-insensitive)
+- `response_regex` - AI response must match regex pattern
+- `custom` - Custom validation (not yet implemented)
+
+### How Seeding Works
+
+Run `pnpm db:seed` to apply changes. The seed script:
+
+1. **Upserts challenges** - Inserts new challenges or updates existing ones (matched by `slug`)
+2. **Removes orphaned challenges** - Challenges in the database but NOT in the code are deleted
+3. **Recalculates user stats** - When challenges are removed, user points and solve counts are recalculated
+
+### Important Warnings
+
+- Removing a challenge from the code will delete it from the database when seeding
+- Users who solved a removed challenge will lose those points
+- ChallengeProgress records are cascade-deleted when challenges are removed
+- Always back up the database before removing challenges in production
+- Changing a challenge's `points` value does NOT automatically recalculate existing user stats (only removal triggers recalculation)
+
 ## Questions?
 
 If you have questions or need help, feel free to open an issue on GitHub.

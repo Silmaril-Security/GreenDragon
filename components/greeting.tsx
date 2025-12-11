@@ -32,11 +32,7 @@ export const Greeting = () => {
         >
           Silmaril
         </a>{" "}
-        to showcase AI risks.{" "}
-        <a href="/" className="font-medium text-foreground hover:underline">
-          Green Dragon
-        </a>{" "}
-        is inspired by{" "}
+        to showcase AI risks. Inspired by{" "}
         <a
           href="https://owasp.org/www-project-juice-shop/"
           target="_blank"
@@ -45,7 +41,11 @@ export const Greeting = () => {
         >
           OWASP Juice Shop
         </a>
-        . It is the most advanced open-source application of its kind.
+        ,{" "}
+        <a href="/" className="font-medium text-foreground hover:underline">
+          Green Dragon
+        </a>{" "}
+        is the most advanced open-source AI security challenge platform of its kind.
       </motion.div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}

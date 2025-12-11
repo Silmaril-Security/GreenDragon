@@ -1,6 +1,6 @@
 # Silmaril Green Dragon
 
-Learn about AI vulnerabilities through interactive challenges.
+Inspired by OWASP Juice Shop, Green Dragon is the most advanced application of its kind.
 
 ## What is Green Dragon?
 

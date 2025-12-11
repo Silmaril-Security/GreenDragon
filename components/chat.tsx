@@ -87,7 +87,7 @@ export function Chat({
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [currentModelId, setCurrentModelId] = useState(initialChatModel);
   const currentModelIdRef = useRef(currentModelId);
-  const { activeChallenge } = useActiveChallenge();
+  const { activeChallenge, clearActiveChallenge } = useActiveChallenge();
   const activeChallengeRef = useRef(activeChallenge);
 
   useEffect(() => {
@@ -137,6 +137,7 @@ export function Chat({
           type: "success",
           description: `Solved! ${dataPart.data.title} +${dataPart.data.points}`,
         });
+        clearActiveChallenge();
       }
     },
     onFinish: () => {

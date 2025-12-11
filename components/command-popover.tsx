@@ -149,7 +149,7 @@ function PureCommandPopover({
   if (!open) return null;
 
   return (
-    <div className="absolute bottom-full left-0 z-50 mb-1 w-full max-w-md">
+    <div className="absolute bottom-full left-0 z-50 w-full max-w-md">
       <Command className="overflow-hidden rounded-lg border bg-popover shadow-lg">
         <div className="border-b px-3 py-2">
           <p className="text-xs text-muted-foreground">
