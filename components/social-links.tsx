@@ -35,8 +35,21 @@ export function SocialLinks() {
             variant="outline"
             className="h-8 px-2 md:h-fit md:px-2"
             onClick={async () => {
-              await copyToClipboard(window.location.origin);
-              toast.success("Link copied to clipboard!");
+              const url = window.location.origin;
+
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: "Silmaril Green Dragon",
+                    url: url,
+                  });
+                } catch {
+                  // User cancelled or share failed
+                }
+              } else {
+                await copyToClipboard(url);
+                toast.success("Link copied to clipboard!");
+              }
             }}
           >
             <Link2 />

@@ -1,6 +1,6 @@
 # Silmaril Green Dragon
 
-An AI security platform for learning about AI vulnerabilities through interactive challenges.
+Learn about AI vulnerabilities through interactive challenges.
 
 ## What is Green Dragon?
 

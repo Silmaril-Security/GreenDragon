@@ -373,7 +373,7 @@ function PureMultimodalInput({
             <div className="flex items-center gap-2 text-muted-foreground">
               <TerminalIcon className="size-4 text-emerald-500 dark:text-emerald-400" />
               <span className="text-sm">
-                <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-mono font-semibold text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">/activate</span> to select a challenge
+                Type <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-mono font-semibold text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">/</span> to select a challenge
               </span>
             </div>
           )}
