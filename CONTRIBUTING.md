@@ -63,6 +63,20 @@ Your Vercel Redis connection URL. Get this from your Vercel project settings und
 
 Your Vercel AI Gateway API key. Get this from [vercel.com/ai-gateway](https://vercel.com/ai-gateway).
 
+#### Challenge Success Values
+
+These environment variables define the secret values that validate challenge completion. Each challenge has a corresponding `SUCCESS_VALUE_<SLUG>` variable:
+
+- `SUCCESS_VALUE_KEEPERS_BURDEN`
+- `SUCCESS_VALUE_INK_AND_SILENCE`
+- `SUCCESS_VALUE_COUNSEL_OF_ECHOES`
+- `SUCCESS_VALUE_SECOND_TONGUE`
+- `SUCCESS_VALUE_THE_UNWEAVING`
+
+Generate unique random strings for each value. These are embedded in challenge system prompts and used to verify when a user has successfully extracted the secret. Keep them confidential - if exposed, users could bypass challenges.
+
+These values are required before running `pnpm db:seed`.
+
 ## Database Setup
 
 Green Dragon uses Neon PostgreSQL for data storage. Follow these steps to set up your database:
