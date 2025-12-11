@@ -51,11 +51,9 @@ About the origin of user's request:
 `;
 
 export const systemPrompt = ({
-  selectedChatModel,
   requestHints,
   challengePrompt,
 }: {
-  selectedChatModel: string;
   requestHints: RequestHints;
   challengePrompt?: string | null;
 }) => {
@@ -64,10 +62,6 @@ export const systemPrompt = ({
   let basePrompt = regularPrompt;
   if (challengePrompt) {
     basePrompt += `\n\n${challengePrompt}`;
-  }
-
-  if (selectedChatModel === "chat-model-reasoning") {
-    return `${basePrompt}\n\n${requestPrompt}`;
   }
 
   return `${basePrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
