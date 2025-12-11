@@ -51,15 +51,21 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
         session: args.session,
       });
 
-      if (args.session?.user?.id) {
-        await saveDocument({
-          id: args.id,
-          title: args.title,
-          content: draftContent,
-          kind: config.kind,
-          userId: args.session.user.id,
-        });
+      if (!draftContent || !draftContent.trim()) {
+        throw new Error("Document content is empty");
       }
+
+      if (!args.session?.user?.id) {
+        throw new Error("Cannot save document: user not authenticated");
+      }
+
+      await saveDocument({
+        id: args.id,
+        title: args.title,
+        content: draftContent,
+        kind: config.kind,
+        userId: args.session.user.id,
+      });
 
       return;
     },
@@ -71,15 +77,21 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
         session: args.session,
       });
 
-      if (args.session?.user?.id) {
-        await saveDocument({
-          id: args.document.id,
-          title: args.document.title,
-          content: draftContent,
-          kind: config.kind,
-          userId: args.session.user.id,
-        });
+      if (!draftContent || !draftContent.trim()) {
+        throw new Error("Document content is empty");
       }
+
+      if (!args.session?.user?.id) {
+        throw new Error("Cannot save document: user not authenticated");
+      }
+
+      await saveDocument({
+        id: args.document.id,
+        title: args.document.title,
+        content: draftContent,
+        kind: config.kind,
+        userId: args.session.user.id,
+      });
 
       return;
     },

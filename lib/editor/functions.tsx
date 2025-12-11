@@ -1,20 +1,18 @@
 "use client";
 
+import { marked } from "marked";
 import { defaultMarkdownSerializer } from "prosemirror-markdown";
 import { DOMParser, type Node } from "prosemirror-model";
 import { Decoration, DecorationSet, type EditorView } from "prosemirror-view";
-import { renderToString } from "react-dom/server";
-
-import { Response } from "@/components/elements/response";
 
 import { documentSchema } from "./config";
 import { createSuggestionWidget, type UISuggestion } from "./suggestions";
 
 export const buildDocumentFromContent = (content: string) => {
   const parser = DOMParser.fromSchema(documentSchema);
-  const stringFromMarkdown = renderToString(<Response>{content}</Response>);
+  const htmlFromMarkdown = marked.parse(content || "", { async: false }) as string;
   const tempContainer = document.createElement("div");
-  tempContainer.innerHTML = stringFromMarkdown;
+  tempContainer.innerHTML = htmlFromMarkdown;
   return parser.parse(tempContainer);
 };
 

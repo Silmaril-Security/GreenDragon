@@ -9,32 +9,47 @@ export const codeDocumentHandler = createDocumentHandler<"code">({
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = "";
 
-    const { fullStream } = streamObject({
-      model: myProvider.languageModel("artifact-model"),
-      system: codePrompt,
-      prompt: title,
-      schema: z.object({
-        code: z.string(),
-      }),
-    });
+    try {
+      const { fullStream } = streamObject({
+        model: myProvider.languageModel("artifact-model"),
+        system: codePrompt,
+        prompt: title,
+        schema: z.object({
+          code: z.string(),
+        }),
+      });
 
-    for await (const delta of fullStream) {
-      const { type } = delta;
+      for await (const delta of fullStream) {
+        const { type } = delta;
 
-      if (type === "object") {
-        const { object } = delta;
-        const { code } = object;
+        if (type === "object") {
+          const { object } = delta;
+          const { code } = object;
 
-        if (code) {
-          dataStream.write({
-            type: "data-codeDelta",
-            data: code ?? "",
-            transient: true,
-          });
+          if (code) {
+            dataStream.write({
+              type: "data-codeDelta",
+              data: code ?? "",
+              transient: true,
+            });
 
-          draftContent = code;
+            draftContent = code;
+          }
         }
       }
+    } catch (error) {
+      console.error("Code content generation failed:", {
+        error,
+        title,
+        model: "artifact-model",
+        stack: error instanceof Error ? error.stack : undefined,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+
+    if (!draftContent.trim()) {
+      throw new Error("Code content generation returned empty result");
     }
 
     return draftContent;
@@ -42,32 +57,48 @@ export const codeDocumentHandler = createDocumentHandler<"code">({
   onUpdateDocument: async ({ document, description, dataStream }) => {
     let draftContent = "";
 
-    const { fullStream } = streamObject({
-      model: myProvider.languageModel("artifact-model"),
-      system: updateDocumentPrompt(document.content, "code"),
-      prompt: description,
-      schema: z.object({
-        code: z.string(),
-      }),
-    });
+    try {
+      const { fullStream } = streamObject({
+        model: myProvider.languageModel("artifact-model"),
+        system: updateDocumentPrompt(document.content, "code"),
+        prompt: description,
+        schema: z.object({
+          code: z.string(),
+        }),
+      });
 
-    for await (const delta of fullStream) {
-      const { type } = delta;
+      for await (const delta of fullStream) {
+        const { type } = delta;
 
-      if (type === "object") {
-        const { object } = delta;
-        const { code } = object;
+        if (type === "object") {
+          const { object } = delta;
+          const { code } = object;
 
-        if (code) {
-          dataStream.write({
-            type: "data-codeDelta",
-            data: code ?? "",
-            transient: true,
-          });
+          if (code) {
+            dataStream.write({
+              type: "data-codeDelta",
+              data: code ?? "",
+              transient: true,
+            });
 
-          draftContent = code;
+            draftContent = code;
+          }
         }
       }
+    } catch (error) {
+      console.error("Code update failed:", {
+        error,
+        documentId: document.id,
+        description,
+        model: "artifact-model",
+        stack: error instanceof Error ? error.stack : undefined,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+
+    if (!draftContent.trim()) {
+      throw new Error("Code update returned empty result");
     }
 
     return draftContent;

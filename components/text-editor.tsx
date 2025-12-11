@@ -43,8 +43,9 @@ function PureEditor({
 
   useEffect(() => {
     if (containerRef.current && !editorRef.current) {
+      const doc = buildDocumentFromContent(content);
       const state = EditorState.create({
-        doc: buildDocumentFromContent(content),
+        doc,
         plugins: [
           ...exampleSetup({ schema: documentSchema, menuBar: false }),
           inputRules({
