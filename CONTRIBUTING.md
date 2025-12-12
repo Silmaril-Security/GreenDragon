@@ -77,6 +77,20 @@ Generate unique random strings for each value. These are embedded in challenge s
 
 These values are required before running `pnpm db:seed`.
 
+#### Firebase Analytics (Optional)
+
+Firebase Analytics is optional. To enable it, add these environment variables from your [Firebase Console](https://console.firebase.google.com):
+
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NEXT_PUBLIC_FIREBASE_APP_ID`
+- `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`
+
+Leave these empty to disable analytics entirely.
+
 ## Database Setup
 
 Green Dragon uses Neon PostgreSQL for data storage. Follow these steps to set up your database:
