@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
 
-interface StatCardProps {
+type StatCardProps = {
   title: string;
   solved: number;
   total: number;
   colorClass?: string;
   bgColorClass?: string;
-}
+};
 
 export function StatCard({
   title,
@@ -20,14 +20,19 @@ export function StatCard({
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-center justify-between">
-        <span className={cn("text-xs font-medium uppercase tracking-wider", colorClass)}>
+        <span
+          className={cn(
+            "font-medium text-xs uppercase tracking-wider",
+            colorClass
+          )}
+        >
           {title}
         </span>
-        <span className="text-xs text-muted-foreground">{percentage}%</span>
+        <span className="text-muted-foreground text-xs">{percentage}%</span>
       </div>
       <div className="mt-2 flex items-baseline gap-1">
-        <span className="text-2xl font-bold">{solved}</span>
-        <span className="text-sm text-muted-foreground">/ {total}</span>
+        <span className="font-bold text-2xl">{solved}</span>
+        <span className="text-muted-foreground text-sm">/ {total}</span>
       </div>
       <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
         <div

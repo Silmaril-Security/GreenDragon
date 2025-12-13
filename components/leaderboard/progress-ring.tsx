@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
 
-interface ProgressRingProps {
+type ProgressRingProps = {
   progress: number; // 0-100
   size?: "sm" | "md" | "lg";
   strokeWidth?: number;
   className?: string;
   children?: React.ReactNode;
-}
+};
 
 const sizeConfig = {
   sm: { diameter: 64, defaultStroke: 4 },
@@ -28,14 +28,23 @@ export function ProgressRing({
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className={cn("relative", className)} style={{ width: config.diameter, height: config.diameter }}>
+    <div
+      className={cn("relative", className)}
+      style={{ width: config.diameter, height: config.diameter }}
+    >
       <svg
-        width={config.diameter}
-        height={config.diameter}
         className="-rotate-90"
+        height={config.diameter}
+        width={config.diameter}
       >
         <defs>
-          <linearGradient id={`emerald-gradient-${size}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <linearGradient
+            id={`emerald-gradient-${size}`}
+            x1="0%"
+            x2="100%"
+            y1="0%"
+            y2="0%"
+          >
             <stop offset="0%" stopColor="#34d399" />
             <stop offset="50%" stopColor="#10b981" />
             <stop offset="100%" stopColor="#34d399" />
@@ -43,26 +52,26 @@ export function ProgressRing({
         </defs>
         {/* Track */}
         <circle
+          className="text-muted-foreground/20"
           cx={config.diameter / 2}
           cy={config.diameter / 2}
-          r={radius}
           fill="none"
+          r={radius}
           stroke="currentColor"
           strokeWidth={stroke}
-          className="text-muted-foreground/20"
         />
         {/* Progress */}
         <circle
+          className="transition-[stroke-dashoffset] duration-500 ease-out"
           cx={config.diameter / 2}
           cy={config.diameter / 2}
-          r={radius}
           fill="none"
+          r={radius}
           stroke={`url(#emerald-gradient-${size})`}
-          strokeWidth={stroke}
-          strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="transition-[stroke-dashoffset] duration-500 ease-out"
+          strokeLinecap="round"
+          strokeWidth={stroke}
         />
       </svg>
       {children && (

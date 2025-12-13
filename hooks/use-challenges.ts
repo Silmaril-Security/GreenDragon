@@ -10,7 +10,7 @@ export function useChallenges() {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      dedupingInterval: 60000, // Cache for 1 minute
+      dedupingInterval: 60_000, // Cache for 1 minute
     }
   );
 

@@ -27,11 +27,11 @@ import type { Attachment, ChatMessage } from "@/lib/types";
 import type { AppUsage } from "@/lib/usage";
 import { fetcher, fetchWithErrorHandlers, generateUUID } from "@/lib/utils";
 import { Artifact } from "./artifact";
+import { showChallengeCelebration } from "./challenge-celebration";
 import { useDataStream } from "./data-stream-provider";
 import { Messages } from "./messages";
 import { MultimodalInput } from "./multimodal-input";
 import { getChatHistoryPaginationKey } from "./sidebar-history";
-import { toast } from "./toast";
 import type { VisibilityType } from "./visibility-selector";
 
 export function Chat({
@@ -133,9 +133,12 @@ export function Chat({
         setUsage(dataPart.data);
       }
       if (dataPart.type === "data-challengeSolved") {
-        toast({
-          type: "success",
-          description: `Solved! ${dataPart.data.title} +${dataPart.data.points}`,
+        showChallengeCelebration({
+          title: dataPart.data.title,
+          difficulty: dataPart.data.difficulty,
+          basePoints: dataPart.data.basePoints,
+          multiplier: dataPart.data.multiplier,
+          earnedPoints: dataPart.data.earnedPoints,
         });
         clearActiveChallenge();
       }

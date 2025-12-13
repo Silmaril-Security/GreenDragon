@@ -2,11 +2,11 @@
 
 import {
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useState,
-  type ReactNode,
 } from "react";
 import type { Challenge } from "@/lib/challenges/data";
 
@@ -44,7 +44,9 @@ export function ActiveChallengeProvider({ children }: { children: ReactNode }) {
 
   // Persist to localStorage when active challenge changes
   useEffect(() => {
-    if (!isHydrated) return;
+    if (!isHydrated) {
+      return;
+    }
 
     if (activeChallenge) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(activeChallenge));

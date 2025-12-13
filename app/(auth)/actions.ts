@@ -69,7 +69,8 @@ export const register = async (
 
     // Check if current session is a guest before creating new user
     const session = await auth();
-    const guestUserId = session?.user?.type === "guest" ? session.user.id : null;
+    const guestUserId =
+      session?.user?.type === "guest" ? session.user.id : null;
 
     await createUser(validatedData.email, validatedData.password);
 

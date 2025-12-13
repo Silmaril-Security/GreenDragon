@@ -1,23 +1,29 @@
 "use client";
 
-import { useMemo } from "react";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useActiveChallenge } from "@/contexts/active-challenge-context";
 import { chatModels } from "@/lib/ai/models";
 import type { ChallengeWithStatus } from "@/lib/challenges/actions";
 import {
-  difficultyConfig,
   categoryConfig,
+  difficultyConfig,
   statusConfig,
 } from "@/lib/challenges/data";
+import { cn } from "@/lib/utils";
+
+// Regex for parsing quoted text at the start of descriptions
+const QUOTE_REGEX = /^["'](.+?)["']\s*\n\n(.+)$/s;
 
 // Parse description into quote and body parts
-function parseDescription(description: string): { quote: string | null; body: string } {
+function parseDescription(description: string): {
+  quote: string | null;
+  body: string;
+} {
   // Match quoted text at the start: "..." or '...'
-  const quoteMatch = description.match(/^["'](.+?)["']\s*\n\n(.+)$/s);
+  const quoteMatch = description.match(QUOTE_REGEX);
   if (quoteMatch) {
     return { quote: quoteMatch[1], body: quoteMatch[2] };
   }
@@ -26,19 +32,22 @@ function parseDescription(description: string): { quote: string | null; body: st
 
 function ChallengeDescription({
   description,
-  variant = "full"
+  variant = "full",
 }: {
   description: string;
   variant?: "full" | "compact" | "mobile";
 }) {
-  const { quote, body } = useMemo(() => parseDescription(description), [description]);
+  const { quote, body } = useMemo(
+    () => parseDescription(description),
+    [description]
+  );
 
   if (variant === "compact") {
     // Desktop: show quote and body
     return (
-      <div className="text-xs text-muted-foreground">
+      <div className="text-muted-foreground text-xs">
         {quote && (
-          <p className="italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+          <p className="text-foreground/70 italic">&ldquo;{quote}&rdquo;</p>
         )}
         <p className="mt-0.5 line-clamp-2">{body}</p>
       </div>
@@ -48,9 +57,9 @@ function ChallengeDescription({
   if (variant === "mobile") {
     // Mobile: show quote and full body
     return (
-      <div className="text-xs text-muted-foreground">
+      <div className="text-muted-foreground text-xs">
         {quote && (
-          <p className="italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+          <p className="text-foreground/70 italic">&ldquo;{quote}&rdquo;</p>
         )}
         <p className="mt-1">{body}</p>
       </div>
@@ -59,9 +68,9 @@ function ChallengeDescription({
 
   // Full: show everything
   return (
-    <div className="text-sm text-muted-foreground">
+    <div className="text-muted-foreground text-sm">
       {quote && (
-        <p className="mb-2 italic text-foreground/70">&ldquo;{quote}&rdquo;</p>
+        <p className="mb-2 text-foreground/70 italic">&ldquo;{quote}&rdquo;</p>
       )}
       <p>{body}</p>
     </div>
@@ -71,7 +80,7 @@ function ChallengeDescription({
 export type SortField = "status" | "title" | "difficulty" | "points";
 export type SortDirection = "asc" | "desc";
 
-interface ChallengesTableProps {
+type ChallengesTableProps = {
   challenges: ChallengeWithStatus[];
   sortField: SortField | null;
   sortDirection: SortDirection;
@@ -80,12 +89,14 @@ interface ChallengesTableProps {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
-}
+};
 
 // Helper to get model short name from modelId
 function getModelShortName(modelId: string): string {
   const model = chatModels.find((m) => m.id === modelId);
-  if (!model) return modelId.split("/").pop() || modelId;
+  if (!model) {
+    return modelId.split("/").pop() || modelId;
+  }
   // Return shortened name (e.g., "Opus 4.5", "GPT-5")
   return model.name
     .replace("Claude ", "")
@@ -112,12 +123,13 @@ function SortableHeader({
 
   return (
     <button
-      onClick={() => onSort(field)}
       className={cn(
-        "group flex items-center gap-1 hover:text-foreground transition-colors",
+        "group flex items-center gap-1 transition-colors hover:text-foreground",
         isActive && "text-foreground",
         className
       )}
+      onClick={() => onSort(field)}
+      type="button"
     >
       {children}
       {isActive ? (
@@ -127,7 +139,7 @@ function SortableHeader({
           <ArrowDown className="size-3" />
         )
       ) : (
-        <ArrowUp className="size-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+        <ArrowUp className="size-3 opacity-0 transition-opacity group-hover:opacity-50" />
       )}
     </button>
   );
@@ -158,38 +170,38 @@ export function ChallengesTable({
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border bg-card">
         {/* Header */}
-        <div className="hidden border-b px-4 py-3 text-sm font-medium text-muted-foreground sm:grid sm:grid-cols-[70px_1fr_140px_100px_60px] sm:gap-4">
+        <div className="hidden border-b px-4 py-3 font-medium text-muted-foreground text-sm sm:grid sm:grid-cols-[70px_1fr_140px_100px_60px] sm:gap-4">
           <SortableHeader
-            field="status"
             currentField={sortField}
             direction={sortDirection}
+            field="status"
             onSort={onSort}
           >
             Status
           </SortableHeader>
           <SortableHeader
-            field="title"
             currentField={sortField}
             direction={sortDirection}
+            field="title"
             onSort={onSort}
           >
             Title
           </SortableHeader>
           <div>Category</div>
           <SortableHeader
-            field="difficulty"
             currentField={sortField}
             direction={sortDirection}
+            field="difficulty"
             onSort={onSort}
           >
             Difficulty
           </SortableHeader>
           <SortableHeader
-            field="points"
+            className="justify-end"
             currentField={sortField}
             direction={sortDirection}
+            field="points"
             onSort={onSort}
-            className="justify-end"
           >
             Points
           </SortableHeader>
@@ -208,10 +220,11 @@ export function ChallengesTable({
               const statConfig = statusConfig[challenge.status];
 
               return (
-                <div
+                <button
+                  className="w-full cursor-pointer px-4 py-3 text-left transition-colors hover:bg-accent/50"
                   key={challenge.id}
                   onClick={() => handleRowClick(challenge)}
-                  className="cursor-pointer px-4 py-3 transition-colors hover:bg-accent/50"
+                  type="button"
                 >
                   {/* Mobile layout */}
                   <div className="flex items-start gap-3 sm:hidden">
@@ -230,24 +243,31 @@ export function ChallengesTable({
                     <div className="flex-1">
                       <div className="font-medium">{challenge.title}</div>
                       <div className="mt-1">
-                        <ChallengeDescription description={challenge.description} variant="mobile" />
+                        <ChallengeDescription
+                          description={challenge.description}
+                          variant="mobile"
+                        />
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                         <span className="text-muted-foreground">
                           {catConfig?.label ?? challenge.category}
                         </span>
-                        <span className={diffConfig?.color}>{diffConfig?.label ?? challenge.difficulty}</span>
+                        <span className={diffConfig?.color}>
+                          {diffConfig?.label ?? challenge.difficulty}
+                        </span>
                         <span className="text-muted-foreground">
                           {challenge.points} pts
                         </span>
                       </div>
                       {challenge.solvedModels.length > 0 && (
                         <div className="mt-2 flex flex-wrap items-center gap-1">
-                          <span className="text-[10px] text-muted-foreground">Solved with:</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            Solved with:
+                          </span>
                           {challenge.solvedModels.map((sm) => (
                             <span
-                              key={sm.modelId}
                               className="rounded bg-green-500/10 px-1.5 py-0.5 text-[10px] text-green-600 dark:text-green-400"
+                              key={sm.modelId}
                               title={`${sm.earnedPoints} pts`}
                             >
                               {getModelShortName(sm.modelId)}
@@ -275,15 +295,20 @@ export function ChallengesTable({
                     <div>
                       <div className="font-medium">{challenge.title}</div>
                       <div className="mt-0.5">
-                        <ChallengeDescription description={challenge.description} variant="compact" />
+                        <ChallengeDescription
+                          description={challenge.description}
+                          variant="compact"
+                        />
                       </div>
                       {challenge.solvedModels.length > 0 && (
                         <div className="mt-1 flex flex-wrap items-center gap-1">
-                          <span className="text-[10px] text-muted-foreground">Solved:</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            Solved:
+                          </span>
                           {challenge.solvedModels.map((sm) => (
                             <span
-                              key={sm.modelId}
                               className="rounded bg-green-500/10 px-1.5 py-0.5 text-[10px] text-green-600 dark:text-green-400"
+                              key={sm.modelId}
                               title={`${sm.earnedPoints} pts`}
                             >
                               {getModelShortName(sm.modelId)}
@@ -292,7 +317,7 @@ export function ChallengesTable({
                         </div>
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-muted-foreground text-sm">
                       {catConfig?.label ?? challenge.category}
                     </div>
                     <div className={cn("text-sm", diffConfig?.color)}>
@@ -300,7 +325,7 @@ export function ChallengesTable({
                     </div>
                     <div className="text-right text-sm">{challenge.points}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -310,28 +335,28 @@ export function ChallengesTable({
       {/* Pagination */}
       {totalItems > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {startItem}-{endItem} of {totalItems} challenges
           </p>
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="icon"
               className="size-8"
-              onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
+              onClick={() => onPageChange(currentPage - 1)}
+              size="icon"
+              variant="outline"
             >
               <ChevronLeft className="size-4" />
             </Button>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-muted-foreground text-sm">
               {currentPage} of {totalPages}
             </span>
             <Button
-              variant="outline"
-              size="icon"
               className="size-8"
-              onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
+              onClick={() => onPageChange(currentPage + 1)}
+              size="icon"
+              variant="outline"
             >
               <ChevronRight className="size-4" />
             </Button>

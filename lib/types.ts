@@ -5,6 +5,7 @@ import type { createDocument } from "./ai/tools/create-document";
 import type { getWeather } from "./ai/tools/get-weather";
 import type { requestSuggestions } from "./ai/tools/request-suggestions";
 import type { updateDocument } from "./ai/tools/update-document";
+import type { Difficulty } from "./challenges/data";
 import type { Suggestion } from "./db/schema";
 import type { AppUsage } from "./usage";
 
@@ -46,7 +47,10 @@ export type CustomUIDataTypes = {
   challengeSolved: {
     challengeId: string;
     title: string;
-    points: number;
+    difficulty: Difficulty;
+    basePoints: number;
+    multiplier: number;
+    earnedPoints: number;
   };
 };
 

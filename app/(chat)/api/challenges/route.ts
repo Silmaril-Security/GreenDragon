@@ -7,6 +7,9 @@ export async function GET() {
     return Response.json(challenges);
   } catch (error) {
     console.error("Failed to fetch challenges:", error);
-    return Response.json({ error: "Failed to fetch challenges" }, { status: 500 });
+    return Response.json(
+      { error: "Failed to fetch challenges" },
+      { status: 500 }
+    );
   }
 }

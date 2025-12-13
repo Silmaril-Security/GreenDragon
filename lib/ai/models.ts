@@ -1,4 +1,4 @@
-export const DEFAULT_CHAT_MODEL: string = "anthropic/claude-sonnet-4.5";
+export const DEFAULT_CHAT_MODEL: string = "anthropic/claude-haiku-4.5";
 
 export type ChatModel = {
   id: string;
@@ -91,5 +91,12 @@ export const chatModels: ChatModel[] = [
     name: "Kimi K2 Thinking",
     description: "Enhanced reasoning with chain-of-thought",
     multiplier: 1.25,
+  },
+  // xAI
+  {
+    id: "xai/grok-4.1-fast-non-reasoning",
+    name: "Grok 4.1 Fast",
+    description: "Fast xAI model optimized for speed",
+    multiplier: 1.0,
   },
 ];

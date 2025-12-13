@@ -20,6 +20,7 @@ const allModelIds: ChatModel["id"][] = [
   "alibaba/qwen3-max",
   "moonshotai/kimi-k2",
   "moonshotai/kimi-k2-thinking",
+  "xai/grok-4.1-fast-non-reasoning",
 ];
 
 export const entitlementsByUserType: Record<UserType, Entitlements> = {

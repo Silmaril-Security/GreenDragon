@@ -170,21 +170,20 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
         </div>
         <SidebarGroupContent>
           <SidebarMenu>
-            {paginatedChatHistories &&
-              paginatedChatHistories
-                .flatMap((paginatedChatHistory) => paginatedChatHistory.chats)
-                .map((chat) => (
-                  <ChatItem
-                    chat={chat}
-                    isActive={chat.id === id}
-                    key={chat.id}
-                    onDelete={(chatId) => {
-                      setDeleteId(chatId);
-                      setShowDeleteDialog(true);
-                    }}
-                    setOpenMobile={setOpenMobile}
-                  />
-                ))}
+            {paginatedChatHistories
+              ?.flatMap((paginatedChatHistory) => paginatedChatHistory.chats)
+              .map((chat) => (
+                <ChatItem
+                  chat={chat}
+                  isActive={chat.id === id}
+                  key={chat.id}
+                  onDelete={(chatId) => {
+                    setDeleteId(chatId);
+                    setShowDeleteDialog(true);
+                  }}
+                  setOpenMobile={setOpenMobile}
+                />
+              ))}
           </SidebarMenu>
 
           <motion.div

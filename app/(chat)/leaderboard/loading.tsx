@@ -33,7 +33,7 @@ function RankingRowSkeleton() {
     <div className="flex items-center gap-4 px-6 py-4">
       <Skeleton className="h-4 w-6" />
       <Skeleton className="size-10 rounded-full" />
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <Skeleton className="h-4 w-24" />
         <div className="mt-1 flex items-center gap-2">
           <Skeleton className="h-1.5 w-24 rounded-full" />
@@ -80,7 +80,7 @@ export default function LeaderboardLoading() {
             <div className="rounded-lg border bg-card p-6">
               <div className="flex items-center gap-4">
                 <Skeleton className="size-12 rounded-full" />
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
                     <Skeleton className="h-7 w-12" />
                     <Skeleton className="h-4 w-16" />
@@ -99,9 +99,11 @@ export default function LeaderboardLoading() {
             <Skeleton className="mb-3 h-3 w-16" />
             <div className="rounded-lg border bg-card">
               <div className="divide-y">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <RankingRowSkeleton key={i} />
-                ))}
+                <RankingRowSkeleton key="ranking-1" />
+                <RankingRowSkeleton key="ranking-2" />
+                <RankingRowSkeleton key="ranking-3" />
+                <RankingRowSkeleton key="ranking-4" />
+                <RankingRowSkeleton key="ranking-5" />
               </div>
             </div>
           </div>

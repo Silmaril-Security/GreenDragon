@@ -2,16 +2,46 @@ export const SilmarilIcon = () => {
   return (
     <svg
       height="20"
-      width="20"
-      viewBox="0 0 32 32"
       style={{ color: "currentcolor" }}
+      viewBox="0 0 32 32"
+      width="20"
     >
       <g transform="translate(16, 16) scale(2.2) translate(-25.803, -24)">
-        <path d="M 29.071 24.068 L 25.798 20.068 L 22.525 24.068 L 25.798 27.947 Z" fill="transparent" strokeWidth="0.5" stroke="currentColor" strokeMiterlimit="10" />
-        <path d="M 29.666 24.424 L 26.273 28.605 L 26.273 30.848 L 31.606 24.424 Z" fill="transparent" strokeWidth="0.5" stroke="currentColor" strokeMiterlimit="10" />
-        <path d="M 21.939 23.576 L 25.334 19.395 L 25.334 17.152 L 20 23.576 Z" fill="transparent" strokeWidth="0.5" stroke="currentColor" strokeMiterlimit="10" />
-        <path d="M 21.939 24.424 L 25.334 28.605 L 25.334 30.848 L 20 24.424 Z" fill="transparent" strokeWidth="0.5" stroke="currentColor" strokeMiterlimit="10" />
-        <path d="M 29.666 23.576 L 26.273 19.395 L 26.273 17.152 L 31.606 23.576 Z" fill="transparent" strokeWidth="0.5" stroke="currentColor" strokeMiterlimit="10" />
+        <path
+          d="M 29.071 24.068 L 25.798 20.068 L 22.525 24.068 L 25.798 27.947 Z"
+          fill="transparent"
+          stroke="currentColor"
+          strokeMiterlimit="10"
+          strokeWidth="0.5"
+        />
+        <path
+          d="M 29.666 24.424 L 26.273 28.605 L 26.273 30.848 L 31.606 24.424 Z"
+          fill="transparent"
+          stroke="currentColor"
+          strokeMiterlimit="10"
+          strokeWidth="0.5"
+        />
+        <path
+          d="M 21.939 23.576 L 25.334 19.395 L 25.334 17.152 L 20 23.576 Z"
+          fill="transparent"
+          stroke="currentColor"
+          strokeMiterlimit="10"
+          strokeWidth="0.5"
+        />
+        <path
+          d="M 21.939 24.424 L 25.334 28.605 L 25.334 30.848 L 20 24.424 Z"
+          fill="transparent"
+          stroke="currentColor"
+          strokeMiterlimit="10"
+          strokeWidth="0.5"
+        />
+        <path
+          d="M 29.666 23.576 L 26.273 19.395 L 26.273 17.152 L 31.606 23.576 Z"
+          fill="transparent"
+          stroke="currentColor"
+          strokeMiterlimit="10"
+          strokeWidth="0.5"
+        />
       </g>
     </svg>
   );

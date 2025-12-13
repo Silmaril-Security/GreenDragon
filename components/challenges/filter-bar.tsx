@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/select";
 import {
   type Category,
-  type Difficulty,
   type ChallengeStatus,
   categoryConfig,
+  type Difficulty,
   difficultyConfig,
   statusConfig,
 } from "@/lib/challenges/data";
 
-interface FilterBarProps {
+type FilterBarProps = {
   category: Category | "all";
   difficulty: Difficulty | "all";
   status: ChallengeStatus | "all";
@@ -27,7 +27,7 @@ interface FilterBarProps {
   onDifficultyChange: (value: Difficulty | "all") => void;
   onStatusChange: (value: ChallengeStatus | "all") => void;
   onSearchChange: (value: string) => void;
-}
+};
 
 export function FilterBar({
   category,
@@ -42,16 +42,16 @@ export function FilterBar({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
       <div className="relative flex-1 sm:max-w-xs">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-muted-foreground" />
         <Input
+          className="pl-9"
+          onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search challenges..."
           value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9"
         />
       </div>
       <div className="flex flex-wrap gap-2 sm:gap-3">
-        <Select value={category} onValueChange={onCategoryChange}>
+        <Select onValueChange={onCategoryChange} value={category}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
@@ -65,7 +65,7 @@ export function FilterBar({
           </SelectContent>
         </Select>
 
-        <Select value={difficulty} onValueChange={onDifficultyChange}>
+        <Select onValueChange={onDifficultyChange} value={difficulty}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Difficulty" />
           </SelectTrigger>
@@ -79,7 +79,7 @@ export function FilterBar({
           </SelectContent>
         </Select>
 
-        <Select value={status} onValueChange={onStatusChange}>
+        <Select onValueChange={onStatusChange} value={status}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>

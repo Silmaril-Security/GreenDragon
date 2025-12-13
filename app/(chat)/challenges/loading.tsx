@@ -69,9 +69,12 @@ export default function ChallengesLoading() {
         <div className="flex flex-col gap-6">
           {/* Stat Cards */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <StatCardSkeleton key={i} />
-            ))}
+            <StatCardSkeleton key="stat-1" />
+            <StatCardSkeleton key="stat-2" />
+            <StatCardSkeleton key="stat-3" />
+            <StatCardSkeleton key="stat-4" />
+            <StatCardSkeleton key="stat-5" />
+            <StatCardSkeleton key="stat-6" />
           </div>
 
           {/* Filter Bar */}
@@ -98,9 +101,11 @@ export default function ChallengesLoading() {
 
               {/* Table rows */}
               <div className="divide-y">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <TableRowSkeleton key={i} />
-                ))}
+                <TableRowSkeleton key="row-1" />
+                <TableRowSkeleton key="row-2" />
+                <TableRowSkeleton key="row-3" />
+                <TableRowSkeleton key="row-4" />
+                <TableRowSkeleton key="row-5" />
               </div>
             </div>
 

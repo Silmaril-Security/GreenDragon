@@ -1,17 +1,17 @@
 "use client";
 
-import { X, Terminal as TerminalIcon } from "lucide-react";
+import { Terminal as TerminalIcon, X } from "lucide-react";
 import { memo } from "react";
-import { difficultyConfig, type Difficulty } from "@/lib/challenges/data";
+import { type Difficulty, difficultyConfig } from "@/lib/challenges/data";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 
-interface ActiveChallengeBadgeProps {
+type ActiveChallengeBadgeProps = {
   title: string;
   difficulty: Difficulty;
   points: number;
   onClear: () => void;
-}
+};
 
 function PureActiveChallengeBadge({
   title,
@@ -24,23 +24,22 @@ function PureActiveChallengeBadge({
   return (
     <div className="flex items-center gap-2 text-muted-foreground">
       <TerminalIcon className="size-4 text-emerald-500 dark:text-emerald-400" />
-      <span className="truncate text-sm font-medium text-foreground">{title}</span>
+      <span className="truncate font-medium text-foreground text-sm">
+        {title}
+      </span>
       <span
-        className={cn(
-          "shrink-0 text-[10px] font-medium",
-          diffConfig.color
-        )}
+        className={cn("shrink-0 font-medium text-[10px]", diffConfig.color)}
       >
         {diffConfig.label}
       </span>
-      <span className="shrink-0 text-xs text-muted-foreground">
+      <span className="shrink-0 text-muted-foreground text-xs">
         {points} pts
       </span>
       <Button
-        variant="ghost"
-        size="icon"
         className="size-5 shrink-0 text-muted-foreground hover:text-foreground"
         onClick={onClear}
+        size="icon"
+        variant="ghost"
       >
         <X className="size-3" />
         <span className="sr-only">Clear active challenge</span>

@@ -15,7 +15,7 @@ export type Category =
 
 export type ChallengeStatus = "solved" | "in-progress" | "not-started";
 
-export interface Challenge {
+export type Challenge = {
   id: string;
   title: string;
   description: string;
@@ -23,7 +23,7 @@ export interface Challenge {
   difficulty: Difficulty;
   points: number;
   status: ChallengeStatus;
-}
+};
 
 export const difficultyConfig: Record<
   Difficulty,

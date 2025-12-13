@@ -15,7 +15,8 @@ test.describe
         throw new Error("Failed to load page");
       }
 
-      let request: ReturnType<typeof response.request> | null = response.request();
+      let request: ReturnType<typeof response.request> | null =
+        response.request();
 
       const chain: string[] = [];
 
@@ -57,7 +58,8 @@ test.describe
         throw new Error("Failed to load page");
       }
 
-      let request: ReturnType<typeof response.request> | null = response.request();
+      let request: ReturnType<typeof response.request> | null =
+        response.request();
 
       const chain: string[] = [];
 
@@ -176,7 +178,9 @@ test.describe
       await expect(page).toHaveURL("/");
     });
 
-    test("Do not navigate to /sign-in for non-guest users", async ({ page }) => {
+    test("Do not navigate to /sign-in for non-guest users", async ({
+      page,
+    }) => {
       await authPage.signIn(testUser.email, testUser.password);
       await page.waitForURL("/");
 

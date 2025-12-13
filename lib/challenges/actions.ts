@@ -2,7 +2,7 @@
 
 import { auth } from "@/app/(auth)/auth";
 import { getChallenges, getUserChallengeProgress } from "@/lib/db/queries";
-import type { Category, Difficulty, ChallengeStatus } from "./data";
+import type { Category, ChallengeStatus, Difficulty } from "./data";
 
 export type SolvedModel = {
   modelId: string;
@@ -21,14 +21,18 @@ export type ChallengeWithStatus = {
   solvedModels: SolvedModel[];
 };
 
-export async function getChallengesWithStatus(): Promise<ChallengeWithStatus[]> {
+export async function getChallengesWithStatus(): Promise<
+  ChallengeWithStatus[]
+> {
   const [challenges, session] = await Promise.all([getChallenges(), auth()]);
 
   // Map challengeId -> array of models solved
   const solvedByChallenge = new Map<string, SolvedModel[]>();
 
   if (session?.user?.id) {
-    const progress = await getUserChallengeProgress({ userId: session.user.id });
+    const progress = await getUserChallengeProgress({
+      userId: session.user.id,
+    });
     for (const p of progress) {
       const existing = solvedByChallenge.get(p.challengeId) || [];
       existing.push({ modelId: p.modelId, earnedPoints: p.earnedPoints });

@@ -1,17 +1,17 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ProgressRing } from "./progress-ring";
 
-export interface LeaderboardUser {
+export type LeaderboardUser = {
   userId: string;
   email: string;
   totalPoints: number;
   solvedCount: number;
-}
+};
 
-interface PodiumProps {
+type PodiumProps = {
   top3: LeaderboardUser[];
   maxPossibleSolves: number;
-}
+};
 
 function PodiumUser({
   user,
@@ -24,9 +24,10 @@ function PodiumUser({
   maxPossibleSolves: number;
   isFirst?: boolean;
 }) {
-  const completion = maxPossibleSolves > 0
-    ? Math.round((user.solvedCount / maxPossibleSolves) * 100)
-    : 0;
+  const completion =
+    maxPossibleSolves > 0
+      ? Math.round((user.solvedCount / maxPossibleSolves) * 100)
+      : 0;
   const initial = user.email.charAt(0).toUpperCase();
 
   if (isFirst) {
@@ -34,20 +35,25 @@ function PodiumUser({
       <div className="flex flex-col items-center">
         <ProgressRing progress={completion} size="lg">
           <Avatar className="size-16">
-            <AvatarFallback className="bg-muted text-muted-foreground text-xl font-medium">
+            <AvatarFallback className="bg-muted font-medium text-muted-foreground text-xl">
               {initial}
             </AvatarFallback>
           </Avatar>
         </ProgressRing>
         <div className="mt-4 text-center">
-          <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300 text-xs font-semibold">
+          <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-semibold text-transparent text-xs dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">
             #1
           </span>
-          <p className="text-sm font-medium truncate max-w-[120px]" title={user.email}>
+          <p
+            className="max-w-[120px] truncate font-medium text-sm"
+            title={user.email}
+          >
             {user.email.split("@")[0]}
           </p>
-          <p className="text-2xl font-bold">{user.totalPoints.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="font-bold text-2xl">
+            {user.totalPoints.toLocaleString()}
+          </p>
+          <p className="text-muted-foreground text-xs">
             {completion}% complete
           </p>
         </div>
@@ -59,20 +65,23 @@ function PodiumUser({
     <div className="flex flex-col items-center">
       <ProgressRing progress={completion} size="md">
         <Avatar className="size-12">
-          <AvatarFallback className="bg-muted text-muted-foreground text-sm font-medium">
+          <AvatarFallback className="bg-muted font-medium text-muted-foreground text-sm">
             {initial}
           </AvatarFallback>
         </Avatar>
       </ProgressRing>
       <div className="mt-3 text-center">
-        <span className="text-xs font-semibold text-muted-foreground">#{rank}</span>
-        <p className="text-sm font-medium truncate max-w-[100px]" title={user.email}>
+        <span className="font-semibold text-muted-foreground text-xs">
+          #{rank}
+        </span>
+        <p
+          className="max-w-[100px] truncate font-medium text-sm"
+          title={user.email}
+        >
           {user.email.split("@")[0]}
         </p>
-        <p className="text-lg font-bold">{user.totalPoints.toLocaleString()}</p>
-        <p className="text-xs text-muted-foreground">
-          {completion}%
-        </p>
+        <p className="font-bold text-lg">{user.totalPoints.toLocaleString()}</p>
+        <p className="text-muted-foreground text-xs">{completion}%</p>
       </div>
     </div>
   );
@@ -98,7 +107,11 @@ export function Podium({ top3, maxPossibleSolves }: PodiumProps) {
         {/* #2 - Left */}
         {second ? (
           <div className="flex flex-col items-center pb-4">
-            <PodiumUser user={second} rank={2} maxPossibleSolves={maxPossibleSolves} />
+            <PodiumUser
+              maxPossibleSolves={maxPossibleSolves}
+              rank={2}
+              user={second}
+            />
           </div>
         ) : (
           <div className="w-[100px]" />
@@ -106,13 +119,22 @@ export function Podium({ top3, maxPossibleSolves }: PodiumProps) {
 
         {/* #1 - Center (elevated) */}
         <div className="flex flex-col items-center">
-          <PodiumUser user={first} rank={1} maxPossibleSolves={maxPossibleSolves} isFirst />
+          <PodiumUser
+            isFirst
+            maxPossibleSolves={maxPossibleSolves}
+            rank={1}
+            user={first}
+          />
         </div>
 
         {/* #3 - Right */}
         {third ? (
           <div className="flex flex-col items-center pb-4">
-            <PodiumUser user={third} rank={3} maxPossibleSolves={maxPossibleSolves} />
+            <PodiumUser
+              maxPossibleSolves={maxPossibleSolves}
+              rank={3}
+              user={third}
+            />
           </div>
         ) : (
           <div className="w-[100px]" />

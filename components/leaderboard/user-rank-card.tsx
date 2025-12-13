@@ -2,20 +2,22 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import type { LeaderboardUser } from "./podium";
 
-interface UserRankCardProps {
+type UserRankCardProps = {
   rank: number | null;
   user: LeaderboardUser | null;
   maxPossibleSolves: number;
-}
+};
 
-export function UserRankCard({ rank, user, maxPossibleSolves }: UserRankCardProps) {
+export function UserRankCard({
+  rank,
+  user,
+  maxPossibleSolves,
+}: UserRankCardProps) {
   // Not logged in
   if (!user) {
     return (
       <div className="rounded-lg border bg-card p-6">
-        <p className="text-muted-foreground">
-          Sign in to track your rank
-        </p>
+        <p className="text-muted-foreground">Sign in to track your rank</p>
       </div>
     );
   }
@@ -31,29 +33,30 @@ export function UserRankCard({ rank, user, maxPossibleSolves }: UserRankCardProp
     );
   }
 
-  const completion = maxPossibleSolves > 0
-    ? Math.round((user.solvedCount / maxPossibleSolves) * 100)
-    : 0;
+  const completion =
+    maxPossibleSolves > 0
+      ? Math.round((user.solvedCount / maxPossibleSolves) * 100)
+      : 0;
   const initial = user.email.charAt(0).toUpperCase();
 
   return (
     <div className="rounded-lg border bg-card p-6">
       <div className="flex items-center gap-4">
         <Avatar className="size-12">
-          <AvatarFallback className="bg-muted text-muted-foreground text-lg font-medium">
+          <AvatarFallback className="bg-muted font-medium text-lg text-muted-foreground">
             {initial}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold">#{rank}</span>
-            <span className="text-muted-foreground truncate">
+            <span className="font-bold text-2xl">#{rank}</span>
+            <span className="truncate text-muted-foreground">
               {user.totalPoints.toLocaleString()} pts
             </span>
           </div>
           <div className="mt-2 flex items-center gap-3">
-            <Progress value={completion} className="flex-1 h-2" />
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
+            <Progress className="h-2 flex-1" value={completion} />
+            <span className="whitespace-nowrap text-muted-foreground text-sm">
               {user.solvedCount}/{maxPossibleSolves} ({completion}%)
             </span>
           </div>

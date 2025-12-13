@@ -1,22 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { StatCard } from "./stat-card";
-import { FilterBar } from "./filter-bar";
-import { ChallengesTable, type SortField, type SortDirection } from "./challenges-table";
+import type { ChallengeWithStatus } from "@/lib/challenges/actions";
 import {
   type Category,
-  type Difficulty,
   type ChallengeStatus,
+  type Difficulty,
   difficultyConfig,
 } from "@/lib/challenges/data";
-import type { ChallengeWithStatus } from "@/lib/challenges/actions";
+import {
+  ChallengesTable,
+  type SortDirection,
+  type SortField,
+} from "./challenges-table";
+import { FilterBar } from "./filter-bar";
+import { StatCard } from "./stat-card";
 
 const ITEMS_PER_PAGE = 10;
 
-interface ChallengesContentProps {
+type ChallengesContentProps = {
   challenges: ChallengeWithStatus[];
-}
+};
 
 const difficultyOrder: Record<Difficulty, number> = {
   novice: 0,
@@ -44,7 +48,7 @@ export function ChallengesContent({ challenges }: ChallengesContentProps) {
   // Reset page when filters or sort changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [category, difficulty, status, search, sortField, sortDirection]);
+  }, []);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -54,7 +58,9 @@ export function ChallengesContent({ challenges }: ChallengesContentProps) {
     const byDifficulty = (Object.keys(difficultyConfig) as Difficulty[]).map(
       (diff) => {
         const diffChallenges = challenges.filter((c) => c.difficulty === diff);
-        const solved = diffChallenges.filter((c) => c.status === "solved").length;
+        const solved = diffChallenges.filter(
+          (c) => c.status === "solved"
+        ).length;
         return {
           difficulty: diff,
           solved,
@@ -70,23 +76,31 @@ export function ChallengesContent({ challenges }: ChallengesContentProps) {
   // Filter challenges
   const filteredChallenges = useMemo(() => {
     return challenges.filter((challenge) => {
-      if (category !== "all" && challenge.category !== category) return false;
-      if (difficulty !== "all" && challenge.difficulty !== difficulty)
+      if (category !== "all" && challenge.category !== category) {
         return false;
-      if (status !== "all" && challenge.status !== status) return false;
+      }
+      if (difficulty !== "all" && challenge.difficulty !== difficulty) {
+        return false;
+      }
+      if (status !== "all" && challenge.status !== status) {
+        return false;
+      }
       if (
         search &&
         !challenge.title.toLowerCase().includes(search.toLowerCase()) &&
         !challenge.description.toLowerCase().includes(search.toLowerCase())
-      )
+      ) {
         return false;
+      }
       return true;
     });
   }, [challenges, category, difficulty, status, search]);
 
   // Sort challenges
   const sortedChallenges = useMemo(() => {
-    if (!sortField) return filteredChallenges;
+    if (!sortField) {
+      return filteredChallenges;
+    }
 
     return [...filteredChallenges].sort((a, b) => {
       let comparison = 0;
@@ -99,10 +113,13 @@ export function ChallengesContent({ challenges }: ChallengesContentProps) {
           comparison = a.title.localeCompare(b.title);
           break;
         case "difficulty":
-          comparison = difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+          comparison =
+            difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
           break;
         case "points":
           comparison = a.points - b.points;
+          break;
+        default:
           break;
       }
 
@@ -137,20 +154,20 @@ export function ChallengesContent({ challenges }: ChallengesContentProps) {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard
-          title="Solved"
-          solved={stats.totalSolved}
-          total={stats.total}
-          colorClass="text-primary"
           bgColorClass="bg-primary"
+          colorClass="text-primary"
+          solved={stats.totalSolved}
+          title="Solved"
+          total={stats.total}
         />
         {stats.byDifficulty.map((stat) => (
           <StatCard
-            key={stat.difficulty}
-            title={stat.label}
-            solved={stat.solved}
-            total={stat.total}
-            colorClass={stat.color}
             bgColorClass={stat.bgColor}
+            colorClass={stat.color}
+            key={stat.difficulty}
+            solved={stat.solved}
+            title={stat.label}
+            total={stat.total}
           />
         ))}
       </div>
@@ -159,24 +176,24 @@ export function ChallengesContent({ challenges }: ChallengesContentProps) {
       <FilterBar
         category={category}
         difficulty={difficulty}
-        status={status}
-        search={search}
         onCategoryChange={setCategory}
         onDifficultyChange={setDifficulty}
-        onStatusChange={setStatus}
         onSearchChange={setSearch}
+        onStatusChange={setStatus}
+        search={search}
+        status={status}
       />
 
       {/* Challenge Table */}
       <ChallengesTable
         challenges={paginatedChallenges}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onSort={handleSort}
         currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={sortedChallenges.length}
         onPageChange={setCurrentPage}
+        onSort={handleSort}
+        sortDirection={sortDirection}
+        sortField={sortField}
+        totalItems={sortedChallenges.length}
+        totalPages={totalPages}
       />
     </div>
   );

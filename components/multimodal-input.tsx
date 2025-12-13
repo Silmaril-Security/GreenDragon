@@ -53,6 +53,10 @@ import { PreviewAttachment } from "./preview-attachment";
 import { Button } from "./ui/button";
 import type { VisibilityType } from "./visibility-selector";
 
+// Regex patterns for command parsing
+const ACTIVATE_WITH_QUERY_REGEX = /^\/activate\s+(.*)/i;
+const ACTIVATE_EXACT_REGEX = /^\/activate$/i;
+
 function PureMultimodalInput({
   chatId,
   input,
@@ -61,11 +65,11 @@ function PureMultimodalInput({
   stop,
   attachments,
   setAttachments,
-  messages,
+  messages: _messages,
   setMessages,
   sendMessage,
   className,
-  selectedVisibilityType,
+  selectedVisibilityType: _selectedVisibilityType,
   selectedModelId,
   onModelChange,
   usage,
@@ -102,16 +106,18 @@ function PureMultimodalInput({
   // Parse slash command from input
   const commandMatch = useMemo(() => {
     // Any input starting with / triggers command mode
-    if (!input.startsWith("/")) return null;
+    if (!input.startsWith("/")) {
+      return null;
+    }
 
     // Match /activate with optional search query
-    const fullMatch = input.match(/^\/activate\s+(.*)/i);
+    const fullMatch = input.match(ACTIVATE_WITH_QUERY_REGEX);
     if (fullMatch) {
       return { command: "activate", query: fullMatch[1] || "" };
     }
 
     // Match exact /activate (no space yet)
-    if (/^\/activate$/i.test(input)) {
+    if (ACTIVATE_EXACT_REGEX.test(input)) {
       return { command: "activate", query: "" };
     }
 
@@ -359,28 +365,37 @@ function PureMultimodalInput({
   return (
     <div className={cn("relative flex w-full flex-col gap-4", className)}>
       {/* Header row with challenge info and Challenges link - invisible when popover is open */}
-      <div className={cn("flex items-center justify-between", showCommandPopover && "invisible")}>
+      <div
+        className={cn(
+          "flex items-center justify-between",
+          showCommandPopover && "invisible"
+        )}
+      >
         {/* Active challenge badge or instruction prompt */}
         {activeChallenge ? (
           <ActiveChallengeBadge
-            title={activeChallenge.title}
             difficulty={activeChallenge.difficulty}
-            points={activeChallenge.points}
             onClear={clearActiveChallenge}
+            points={activeChallenge.points}
+            title={activeChallenge.title}
           />
         ) : (
           <div className="flex items-center gap-2 text-muted-foreground">
             <TerminalIcon className="size-4 text-emerald-500 dark:text-emerald-400" />
             <span className="text-sm">
-              Type <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-mono font-semibold text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">/</span> to select a challenge
+              Type{" "}
+              <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 bg-clip-text font-mono font-semibold text-transparent dark:from-emerald-300 dark:via-emerald-400 dark:to-emerald-300">
+                /
+              </span>{" "}
+              to select a challenge
             </span>
           </div>
         )}
 
         {/* Challenges link */}
         <Link
+          className="text-muted-foreground text-xs transition-colors hover:text-foreground"
           href="/challenges"
-          className="text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           Challenges
         </Link>
@@ -388,15 +403,15 @@ function PureMultimodalInput({
 
       {/* Command popover */}
       <CommandPopover
-        open={showCommandPopover}
+        anchorRef={textareaRef}
+        challenges={challenges}
         onClose={() => {
           setShowCommandPopover(false);
           setInput("");
         }}
         onSelect={handleSelectChallenge}
-        challenges={challenges}
+        open={showCommandPopover}
         searchQuery={commandMatch?.query || ""}
-        anchorRef={textareaRef}
       />
 
       <input
@@ -496,7 +511,7 @@ function PureMultimodalInput({
           )}
         </PromptInputToolbar>
       </PromptInput>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-muted-foreground text-xs">
         Every solved challenge helps secure AI against real threats.
       </p>
     </div>
@@ -606,14 +621,12 @@ function PureModelSelectorCompact({
 
             return (
               <div key={model.id}>
-                {showDivider && (
-                  <div className="my-1 h-px bg-border" />
-                )}
+                {showDivider && <div className="my-1 h-px bg-border" />}
                 <SelectItem value={model.name}>
                   <div className="flex items-center gap-1.5 truncate font-medium text-xs">
                     {model.name}
                     {model.multiplier > 1 && (
-                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 px-1.5 py-0.5 font-semibold text-amber-600 text-[10px] dark:from-amber-500/30 dark:to-yellow-500/30 dark:text-amber-400">
+                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 px-1.5 py-0.5 font-semibold text-[10px] text-amber-600 dark:from-amber-500/30 dark:to-yellow-500/30 dark:text-amber-400">
                         {model.multiplier}x
                       </span>
                     )}

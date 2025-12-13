@@ -19,13 +19,14 @@ import { getUsage } from "tokenlens/helpers";
 import { auth, type UserType } from "@/app/(auth)/auth";
 import type { VisibilityType } from "@/components/visibility-selector";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
-import { chatModels, type ChatModel } from "@/lib/ai/models";
+import { type ChatModel, chatModels } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
 import { updateDocument } from "@/lib/ai/tools/update-document";
+import { validateResponse } from "@/lib/challenges/validation";
 import { isProductionEnvironment } from "@/lib/constants";
 import {
   createStreamId,
@@ -40,7 +41,6 @@ import {
   saveMessages,
   updateChatLastContextById,
 } from "@/lib/db/queries";
-import { validateResponse } from "@/lib/challenges/validation";
 import type { DBMessage } from "@/lib/db/schema";
 import { ChatSDKError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
@@ -209,8 +209,16 @@ export async function POST(request: Request) {
           experimental_transform: smoothStream({ chunking: "word" }),
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream, modelId: selectedChatModel }),
-            updateDocument: updateDocument({ session, dataStream, modelId: selectedChatModel }),
+            createDocument: createDocument({
+              session,
+              dataStream,
+              modelId: selectedChatModel,
+            }),
+            updateDocument: updateDocument({
+              session,
+              dataStream,
+              modelId: selectedChatModel,
+            }),
             requestSuggestions: requestSuggestions({
               session,
               dataStream,
@@ -226,11 +234,15 @@ export async function POST(request: Request) {
             try {
               const providers = await getTokenlensCatalog();
               const modelId = selectedChatModel;
-              if (!providers) {
-                finalMergedUsage = usage;
-              } else {
+              if (providers) {
                 const summary = getUsage({ modelId, usage, providers });
-                finalMergedUsage = { ...usage, ...summary, modelId } as AppUsage;
+                finalMergedUsage = {
+                  ...usage,
+                  ...summary,
+                  modelId,
+                } as AppUsage;
+              } else {
+                finalMergedUsage = usage;
               }
               dataStream.write({ type: "data-usage", data: finalMergedUsage });
             } catch (err) {
@@ -250,7 +262,9 @@ export async function POST(request: Request) {
         if (session?.user?.id && finalResponseText && activeChallenge) {
           try {
             // Get model multiplier
-            const currentModel = chatModels.find(m => m.id === selectedChatModel);
+            const currentModel = chatModels.find(
+              (m) => m.id === selectedChatModel
+            );
             const multiplier = currentModel?.multiplier ?? 1.0;
 
             // Check if already solved with this model
@@ -267,7 +281,9 @@ export async function POST(request: Request) {
               );
 
               if (validationResult.success) {
-                const earnedPoints = Math.round(activeChallenge.points * multiplier);
+                const earnedPoints = Math.round(
+                  activeChallenge.points * multiplier
+                );
 
                 await markChallengeSolved({
                   userId: session.user.id,
@@ -281,6 +297,7 @@ export async function POST(request: Request) {
                   data: {
                     challengeId: activeChallenge.id,
                     title: activeChallenge.title,
+                    difficulty: activeChallenge.difficulty,
                     basePoints: activeChallenge.points,
                     multiplier,
                     earnedPoints,

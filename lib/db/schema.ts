@@ -239,7 +239,11 @@ export const challengeProgress = pgTable(
     createdAt: timestamp("createdAt").notNull().defaultNow(),
   },
   (table) => ({
-    userChallengeModel: unique().on(table.userId, table.challengeId, table.modelId),
+    userChallengeModel: unique().on(
+      table.userId,
+      table.challengeId,
+      table.modelId
+    ),
     userIdx: index("cp_user_idx").on(table.userId),
   })
 );

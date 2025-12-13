@@ -22,11 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "./ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { VisibilitySelector, type VisibilityType } from "./visibility-selector";
 
 function PureChatHeader({
@@ -63,80 +59,80 @@ function PureChatHeader({
 
   return (
     <>
-    <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
-      <SidebarToggle />
+      <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2">
+        <SidebarToggle />
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            className="h-8 px-2 md:h-fit md:px-2"
-            onClick={() => {
-              router.push("/");
-              router.refresh();
-            }}
-            variant="outline"
-          >
-            <PlusIcon />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent align="start" className="hidden md:block">
-          New Chat
-        </TooltipContent>
-      </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="h-8 px-2 md:h-fit md:px-2"
+              onClick={() => {
+                router.push("/");
+                router.refresh();
+              }}
+              variant="outline"
+            >
+              <PlusIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent align="start" className="hidden md:block">
+            New Chat
+          </TooltipContent>
+        </Tooltip>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            className="h-8 px-2 md:h-fit md:px-2"
-            onClick={() => setShowDeleteAllDialog(true)}
-            variant="outline"
-          >
-            <TrashIcon />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent align="start" className="hidden md:block">
-          Delete All Chats
-        </TooltipContent>
-      </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="h-8 px-2 md:h-fit md:px-2"
+              onClick={() => setShowDeleteAllDialog(true)}
+              variant="outline"
+            >
+              <TrashIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent align="start" className="hidden md:block">
+            Delete All Chats
+          </TooltipContent>
+        </Tooltip>
 
-      {!isReadonly && (
-        <VisibilitySelector
-          chatId={chatId}
-          className="order-1 md:order-2"
-          selectedVisibilityType={selectedVisibilityType}
-        />
-      )}
-
-      <div className="order-3 ml-auto flex items-center gap-2">
-        {isGuest && (
-          <Button asChild size="sm">
-            <Link href="/sign-up">Sign Up</Link>
-          </Button>
+        {!isReadonly && (
+          <VisibilitySelector
+            chatId={chatId}
+            className="order-1 md:order-2"
+            selectedVisibilityType={selectedVisibilityType}
+          />
         )}
-        <SocialLinks />
-      </div>
-    </header>
 
-    <AlertDialog
-      onOpenChange={setShowDeleteAllDialog}
-      open={showDeleteAllDialog}
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete all chats?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete all
-            your chats and remove them from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteAll}>
-            Delete All
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        <div className="order-3 ml-auto flex items-center gap-2">
+          {isGuest && (
+            <Button asChild size="sm">
+              <Link href="/sign-up">Sign Up</Link>
+            </Button>
+          )}
+          <SocialLinks />
+        </div>
+      </header>
+
+      <AlertDialog
+        onOpenChange={setShowDeleteAllDialog}
+        open={showDeleteAllDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete all chats?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete all
+              your chats and remove them from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAll}>
+              Delete All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

@@ -10,8 +10,8 @@ import {
   gte,
   inArray,
   lt,
-  sql,
   type SQL,
+  sql,
 } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -22,10 +22,10 @@ import type { AppUsage } from "../usage";
 import { generateUUID } from "../utils";
 import {
   type Challenge,
-  challenge,
   type ChallengeProgress,
-  challengeProgress,
   type Chat,
+  challenge,
+  challengeProgress,
   chat,
   type DBMessage,
   document,
@@ -43,8 +43,11 @@ import { generateHashedPassword } from "./utils";
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
 
-// biome-ignore lint: Forbidden non-null assertion.
-const client = postgres((process.env.POSTGRES_URL || process.env.DATABASE_URL)!);
+const connectionString = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("Database connection string not found");
+}
+const client = postgres(connectionString);
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<User[]> {
@@ -854,7 +857,9 @@ export async function transferGuestProgress({
 
         // 5. Calculate points for transferred challenges
         const pointsResult = await tx
-          .select({ points: sql<number>`COALESCE(SUM(${challenge.points}), 0)` })
+          .select({
+            points: sql<number>`COALESCE(SUM(${challenge.points}), 0)`,
+          })
           .from(challengeProgress)
           .innerJoin(challenge, eq(challengeProgress.challengeId, challenge.id))
           .where(

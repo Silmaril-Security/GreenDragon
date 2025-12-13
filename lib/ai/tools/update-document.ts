@@ -11,7 +11,11 @@ type UpdateDocumentProps = {
   modelId: string;
 };
 
-export const updateDocument = ({ session, dataStream, modelId }: UpdateDocumentProps) =>
+export const updateDocument = ({
+  session,
+  dataStream,
+  modelId,
+}: UpdateDocumentProps) =>
   tool({
     description: "Update a document with the given description.",
     inputSchema: z.object({

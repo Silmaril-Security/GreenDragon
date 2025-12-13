@@ -10,7 +10,9 @@ import { createSuggestionWidget, type UISuggestion } from "./suggestions";
 
 export const buildDocumentFromContent = (content: string) => {
   const parser = DOMParser.fromSchema(documentSchema);
-  const htmlFromMarkdown = marked.parse(content || "", { async: false }) as string;
+  const htmlFromMarkdown = marked.parse(content || "", {
+    async: false,
+  }) as string;
   const tempContainer = document.createElement("div");
   tempContainer.innerHTML = htmlFromMarkdown;
   return parser.parse(tempContainer);

@@ -14,7 +14,11 @@ type CreateDocumentProps = {
   modelId: string;
 };
 
-export const createDocument = ({ session, dataStream, modelId }: CreateDocumentProps) =>
+export const createDocument = ({
+  session,
+  dataStream,
+  modelId,
+}: CreateDocumentProps) =>
   tool({
     description:
       "Create a document for a writing or content creation activities. This tool will call other functions that will generate the contents of the document based on the title and kind.",
