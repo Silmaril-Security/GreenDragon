@@ -114,8 +114,9 @@ export const updateDocumentPrompt = (
 ${currentContent}`;
 };
 
-export const titlePrompt = `\n
-    - you will generate a short title based on the first message a user begins a conversation with
-    - ensure it is not more than 80 characters long
-    - the title should be a summary of the user's message
-    - do not use quotes or colons`;
+export const titlePrompt = `Generate a short, plain text title for this conversation. Requirements:
+- Maximum 40 characters
+- No markdown formatting (no **, \`, #, or other symbols)
+- No quotes or colons
+- Plain text only
+- Be concise`;
