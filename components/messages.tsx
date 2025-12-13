@@ -38,8 +38,8 @@ function hasRenderableContent(messages: ChatMessage[]): boolean {
       if (part.type === "reasoning" && part.text?.trim()) {
         return true;
       }
-      // Only hide thinking for tool-result (completed tools), not tool-invocation
-      if (part.type === "tool-result") {
+      // Only hide thinking for tool parts (completed tools), not tool-invocation
+      if (part.type.startsWith("tool-")) {
         return true;
       }
       return false;
