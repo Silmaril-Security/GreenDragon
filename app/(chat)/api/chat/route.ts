@@ -19,7 +19,7 @@ import { getUsage } from "tokenlens/helpers";
 import { auth, type UserType } from "@/app/(auth)/auth";
 import type { VisibilityType } from "@/components/visibility-selector";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
-import type { ChatModel } from "@/lib/ai/models";
+import { chatModels, type ChatModel } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
@@ -249,10 +249,15 @@ export async function POST(request: Request) {
         // Only validate against active challenge (optimized)
         if (session?.user?.id && finalResponseText && activeChallenge) {
           try {
-            // Check if already solved
+            // Get model multiplier
+            const currentModel = chatModels.find(m => m.id === selectedChatModel);
+            const multiplier = currentModel?.multiplier ?? 1.0;
+
+            // Check if already solved with this model
             const alreadySolved = await isChallengeSolved({
               userId: session.user.id,
               challengeId: activeChallenge.id,
+              modelId: selectedChatModel,
             });
 
             if (!alreadySolved) {
@@ -262,10 +267,13 @@ export async function POST(request: Request) {
               );
 
               if (validationResult.success) {
+                const earnedPoints = Math.round(activeChallenge.points * multiplier);
+
                 await markChallengeSolved({
                   userId: session.user.id,
                   challengeId: activeChallenge.id,
-                  points: activeChallenge.points,
+                  modelId: selectedChatModel,
+                  earnedPoints,
                 });
 
                 dataStream.write({
@@ -273,7 +281,9 @@ export async function POST(request: Request) {
                   data: {
                     challengeId: activeChallenge.id,
                     title: activeChallenge.title,
-                    points: activeChallenge.points,
+                    basePoints: activeChallenge.points,
+                    multiplier,
+                    earnedPoints,
                   },
                 });
               }

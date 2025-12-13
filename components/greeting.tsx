@@ -55,7 +55,8 @@ export const Greeting = () => {
         transition={{ delay: 0.7 }}
       >
         Solve hyper-realistic security challenges, earn points, and start your
-        white-hat AI hacker journey.
+        white-hat AI hacker journey. More advanced models are harder to fool, so
+        use them to earn bonuses.
       </motion.div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}

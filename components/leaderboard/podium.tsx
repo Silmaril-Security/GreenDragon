@@ -10,22 +10,22 @@ export interface LeaderboardUser {
 
 interface PodiumProps {
   top3: LeaderboardUser[];
-  totalChallenges: number;
+  maxPossibleSolves: number;
 }
 
 function PodiumUser({
   user,
   rank,
-  totalChallenges,
+  maxPossibleSolves,
   isFirst,
 }: {
   user: LeaderboardUser;
   rank: number;
-  totalChallenges: number;
+  maxPossibleSolves: number;
   isFirst?: boolean;
 }) {
-  const completion = totalChallenges > 0
-    ? Math.round((user.solvedCount / totalChallenges) * 100)
+  const completion = maxPossibleSolves > 0
+    ? Math.round((user.solvedCount / maxPossibleSolves) * 100)
     : 0;
   const initial = user.email.charAt(0).toUpperCase();
 
@@ -78,7 +78,7 @@ function PodiumUser({
   );
 }
 
-export function Podium({ top3, totalChallenges }: PodiumProps) {
+export function Podium({ top3, maxPossibleSolves }: PodiumProps) {
   if (top3.length === 0) {
     return (
       <div className="rounded-lg border bg-card p-8 text-center">
@@ -98,7 +98,7 @@ export function Podium({ top3, totalChallenges }: PodiumProps) {
         {/* #2 - Left */}
         {second ? (
           <div className="flex flex-col items-center pb-4">
-            <PodiumUser user={second} rank={2} totalChallenges={totalChallenges} />
+            <PodiumUser user={second} rank={2} maxPossibleSolves={maxPossibleSolves} />
           </div>
         ) : (
           <div className="w-[100px]" />
@@ -106,13 +106,13 @@ export function Podium({ top3, totalChallenges }: PodiumProps) {
 
         {/* #1 - Center (elevated) */}
         <div className="flex flex-col items-center">
-          <PodiumUser user={first} rank={1} totalChallenges={totalChallenges} isFirst />
+          <PodiumUser user={first} rank={1} maxPossibleSolves={maxPossibleSolves} isFirst />
         </div>
 
         {/* #3 - Right */}
         {third ? (
           <div className="flex flex-col items-center pb-4">
-            <PodiumUser user={third} rank={3} totalChallenges={totalChallenges} />
+            <PodiumUser user={third} rank={3} maxPossibleSolves={maxPossibleSolves} />
           </div>
         ) : (
           <div className="w-[100px]" />

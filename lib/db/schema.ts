@@ -230,12 +230,16 @@ export const challengeProgress = pgTable(
       .notNull()
       .references(() => challenge.id, { onDelete: "cascade" }),
 
+    modelId: varchar("modelId", { length: 128 }).notNull(),
+
+    earnedPoints: integer("earnedPoints").notNull(),
+
     solvedAt: timestamp("solvedAt").notNull(),
 
     createdAt: timestamp("createdAt").notNull().defaultNow(),
   },
   (table) => ({
-    userChallenge: unique().on(table.userId, table.challengeId),
+    userChallengeModel: unique().on(table.userId, table.challengeId, table.modelId),
     userIdx: index("cp_user_idx").on(table.userId),
   })
 );

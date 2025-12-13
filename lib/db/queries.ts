@@ -671,9 +671,11 @@ export async function getUserChallengeProgress({
 export async function isChallengeSolved({
   userId,
   challengeId,
+  modelId,
 }: {
   userId: string;
   challengeId: string;
+  modelId: string;
 }): Promise<boolean> {
   try {
     const [result] = await db
@@ -682,7 +684,8 @@ export async function isChallengeSolved({
       .where(
         and(
           eq(challengeProgress.userId, userId),
-          eq(challengeProgress.challengeId, challengeId)
+          eq(challengeProgress.challengeId, challengeId),
+          eq(challengeProgress.modelId, modelId)
         )
       );
     return !!result;
@@ -697,18 +700,22 @@ export async function isChallengeSolved({
 export async function markChallengeSolved({
   userId,
   challengeId,
-  points,
+  modelId,
+  earnedPoints,
 }: {
   userId: string;
   challengeId: string;
-  points: number;
+  modelId: string;
+  earnedPoints: number;
 }): Promise<void> {
   try {
     await db.transaction(async (tx) => {
-      // Insert progress record
+      // Insert progress record with model and earned points
       await tx.insert(challengeProgress).values({
         userId,
         challengeId,
+        modelId,
+        earnedPoints,
         solvedAt: new Date(),
       });
 
@@ -716,7 +723,7 @@ export async function markChallengeSolved({
       await tx
         .update(user)
         .set({
-          totalPoints: sql`${user.totalPoints} + ${points}`,
+          totalPoints: sql`${user.totalPoints} + ${earnedPoints}`,
           solvedCount: sql`${user.solvedCount} + 1`,
         })
         .where(eq(user.id, userId));

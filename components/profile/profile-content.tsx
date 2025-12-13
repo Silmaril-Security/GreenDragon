@@ -48,122 +48,137 @@ export function ProfileContent({
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+    <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-6 md:py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold md:text-3xl">Settings</h1>
+      </div>
 
-      {/* Account Section */}
-      <section className="mb-6 rounded-lg border bg-card">
-        <div className="border-b px-4 py-2">
-          <h2 className="text-xs font-medium tracking-wider text-muted-foreground">
+      <div className="flex flex-col gap-8">
+        {/* Account Section */}
+        <div>
+          <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Account
-          </h2>
-        </div>
-        <div className="divide-y">
-          <div className="flex items-center gap-3 p-4">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-medium uppercase text-primary-foreground">
-              {email[0]}
-            </div>
-            <div className="min-w-0">
-              <div className="truncate font-medium">{email}</div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-4 p-4">
-            <span className="text-muted-foreground">Sign Out</span>
-            <Button onClick={() => signOut({ redirectTo: "/" })} variant="outline">
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="mb-6 rounded-lg border bg-card">
-        <div className="border-b px-4 py-2">
-          <h2 className="text-xs font-medium tracking-wider text-muted-foreground">
-            Stats
-          </h2>
-        </div>
-        <div className="divide-y">
-          <div className="flex justify-between p-4">
-            <span className="text-muted-foreground">Total Points</span>
-            <span className="font-medium">{totalPoints}</span>
-          </div>
-          <div className="flex justify-between p-4">
-            <span className="text-muted-foreground">Challenges Solved</span>
-            <span className="font-medium">
-              {solvedCount} of {totalChallenges}
-            </span>
-          </div>
-          <div className="flex justify-between p-4">
-            <span className="text-muted-foreground">Leaderboard Rank</span>
-            <span className="font-medium">{rank ? `#${rank}` : "—"}</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Appearance Section */}
-      <section className="mb-6 rounded-lg border bg-card">
-        <div className="border-b px-4 py-2">
-          <h2 className="text-xs font-medium tracking-wider text-muted-foreground">
-            Appearance
-          </h2>
-        </div>
-        <div className="flex items-center justify-between p-4">
-          <span className="text-muted-foreground">Theme</span>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setTheme("light")}
-              size="sm"
-              variant={resolvedTheme === "light" ? "default" : "outline"}
-            >
-              Light
-            </Button>
-            <Button
-              onClick={() => setTheme("dark")}
-              size="sm"
-              variant={resolvedTheme === "dark" ? "default" : "outline"}
-            >
-              Dark
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Danger Zone */}
-      <section className="rounded-lg border border-destructive bg-card">
-        <div className="border-b border-destructive px-4 py-2">
-          <h2 className="text-xs font-medium tracking-wider text-destructive">
-            Danger Zone
-          </h2>
-        </div>
-        <div className="flex items-center justify-between gap-4 p-4">
-          <span className="text-muted-foreground">Reset Progress</span>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button disabled={isResetting} variant="destructive">
-                {isResetting ? "Resetting..." : "Reset"}
+          </h3>
+          <div className="rounded-lg border bg-card p-6">
+            <div className="flex items-center gap-4">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-medium uppercase text-primary-foreground">
+                {email[0]}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-medium">{email}</div>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Signed in
+                </p>
+              </div>
+              <Button onClick={() => signOut({ redirectTo: "/" })} variant="outline">
+                Sign Out
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Reset Progress?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  onClick={handleReset}
-                >
-                  Reset Progress
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            </div>
+          </div>
         </div>
-      </section>
+
+        {/* Stats Section */}
+        <div>
+          <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Stats
+          </h3>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="rounded-lg border bg-card p-6">
+              <p className="text-sm text-muted-foreground">Total Points</p>
+              <p className="mt-1 text-2xl font-bold">{totalPoints}</p>
+            </div>
+            <div className="rounded-lg border bg-card p-6">
+              <p className="text-sm text-muted-foreground">Challenges Solved</p>
+              <p className="mt-1 text-2xl font-bold">
+                {solvedCount}
+                <span className="text-base font-normal text-muted-foreground">
+                  {" "}/ {totalChallenges}
+                </span>
+              </p>
+            </div>
+            <div className="rounded-lg border bg-card p-6">
+              <p className="text-sm text-muted-foreground">Leaderboard Rank</p>
+              <p className="mt-1 text-2xl font-bold">
+                {rank ? `#${rank}` : "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Appearance Section */}
+        <div>
+          <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Appearance
+          </h3>
+          <div className="rounded-lg border bg-card p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Theme</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Choose your preferred appearance
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setTheme("light")}
+                  size="sm"
+                  variant={resolvedTheme === "light" ? "default" : "outline"}
+                >
+                  Light
+                </Button>
+                <Button
+                  onClick={() => setTheme("dark")}
+                  size="sm"
+                  variant={resolvedTheme === "dark" ? "default" : "outline"}
+                >
+                  Dark
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Danger Zone */}
+        <div>
+          <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-destructive">
+            Danger Zone
+          </h3>
+          <div className="rounded-lg border border-destructive bg-card p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Reset Progress</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Clear all your challenge progress and points
+                </p>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button disabled={isResetting} variant="destructive">
+                    {isResetting ? "Resetting..." : "Reset"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset Progress?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={handleReset}
+                    >
+                      Reset Progress
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

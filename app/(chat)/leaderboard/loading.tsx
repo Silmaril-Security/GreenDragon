@@ -30,9 +30,9 @@ function PodiumUserSkeleton({ isFirst }: { isFirst?: boolean }) {
 
 function RankingRowSkeleton() {
   return (
-    <div className="flex items-center gap-4 px-4 py-3">
+    <div className="flex items-center gap-4 px-6 py-4">
       <Skeleton className="h-4 w-6" />
-      <Skeleton className="size-8 rounded-full" />
+      <Skeleton className="size-10 rounded-full" />
       <div className="flex-1 min-w-0">
         <Skeleton className="h-4 w-24" />
         <div className="mt-1 flex items-center gap-2">
@@ -56,45 +56,54 @@ export default function LeaderboardLoading() {
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
-        <Skeleton className="h-8 w-32" />
-
-        {/* Podium */}
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-end justify-center gap-4 sm:gap-8">
-            <PodiumUserSkeleton />
-            <PodiumUserSkeleton isFirst />
-            <PodiumUserSkeleton />
-          </div>
+      <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-6 md:py-8">
+        <div className="mb-8">
+          <Skeleton className="h-8 w-32" />
         </div>
 
-        {/* User Rank Card */}
-        <div className="rounded-lg border bg-card p-4">
-          <Skeleton className="h-3 w-16" />
-          <div className="mt-3 flex items-center gap-4">
-            <Skeleton className="size-10 rounded-full" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-2">
-                <Skeleton className="h-7 w-10" />
-                <Skeleton className="h-4 w-16" />
-              </div>
-              <div className="mt-2 flex items-center gap-3">
-                <Skeleton className="h-2 flex-1 rounded-full" />
-                <Skeleton className="h-3 w-20" />
+        <div className="flex flex-col gap-8">
+          {/* Top Players */}
+          <div>
+            <Skeleton className="mb-3 h-3 w-20" />
+            <div className="rounded-lg border bg-card p-6">
+              <div className="flex items-end justify-center gap-6 sm:gap-10">
+                <PodiumUserSkeleton />
+                <PodiumUserSkeleton isFirst />
+                <PodiumUserSkeleton />
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Rankings List */}
-        <div className="rounded-lg border bg-card">
-          <div className="border-b px-4 py-3">
-            <Skeleton className="h-3 w-16" />
+          {/* Your Rank */}
+          <div>
+            <Skeleton className="mb-3 h-3 w-16" />
+            <div className="rounded-lg border bg-card p-6">
+              <div className="flex items-center gap-4">
+                <Skeleton className="size-12 rounded-full" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2">
+                    <Skeleton className="h-7 w-12" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <div className="mt-2 flex items-center gap-3">
+                    <Skeleton className="h-2 flex-1 rounded-full" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="divide-y">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <RankingRowSkeleton key={i} />
-            ))}
+
+          {/* Rankings */}
+          <div>
+            <Skeleton className="mb-3 h-3 w-16" />
+            <div className="rounded-lg border bg-card">
+              <div className="divide-y">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <RankingRowSkeleton key={i} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -93,7 +93,14 @@ export function ModelSelector({
                   type="button"
                 >
                   <div className="flex flex-col items-start gap-1">
-                    <div className="text-sm sm:text-base">{chatModel.name}</div>
+                    <div className="flex items-center gap-2 text-sm sm:text-base">
+                      {chatModel.name}
+                      {chatModel.multiplier > 1 && (
+                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 px-2 py-0.5 font-semibold text-amber-600 text-xs dark:from-amber-500/30 dark:to-yellow-500/30 dark:text-amber-400">
+                          {chatModel.multiplier}x pts
+                        </span>
+                      )}
+                    </div>
                     <div className="line-clamp-2 text-muted-foreground text-xs">
                       {chatModel.description}
                     </div>

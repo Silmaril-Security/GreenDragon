@@ -610,7 +610,14 @@ function PureModelSelectorCompact({
                   <div className="my-1 h-px bg-border" />
                 )}
                 <SelectItem value={model.name}>
-                  <div className="truncate font-medium text-xs">{model.name}</div>
+                  <div className="flex items-center gap-1.5 truncate font-medium text-xs">
+                    {model.name}
+                    {model.multiplier > 1 && (
+                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 px-1.5 py-0.5 font-semibold text-amber-600 text-[10px] dark:from-amber-500/30 dark:to-yellow-500/30 dark:text-amber-400">
+                        {model.multiplier}x
+                      </span>
+                    )}
+                  </div>
                   <div className="mt-px truncate text-[10px] text-muted-foreground leading-tight">
                     {model.description}
                   </div>

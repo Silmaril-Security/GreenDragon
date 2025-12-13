@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/app/(auth)/auth";
+import { chatModels } from "@/lib/ai/models";
 import { getChallenges, getLeaderboard } from "@/lib/db/queries";
 
 export type LeaderboardUser = {
@@ -17,6 +18,8 @@ export type LeaderboardData = {
     data: LeaderboardUser | null;
   };
   totalChallenges: number;
+  totalModels: number;
+  maxPossibleSolves: number;
 };
 
 export async function getLeaderboardData(): Promise<LeaderboardData> {
@@ -27,6 +30,8 @@ export async function getLeaderboardData(): Promise<LeaderboardData> {
   ]);
 
   const totalChallenges = challenges.length;
+  const totalModels = chatModels.length;
+  const maxPossibleSolves = totalChallenges * totalModels;
   const userId = session?.user?.id;
 
   let currentUserRank: number | null = null;
@@ -55,5 +60,7 @@ export async function getLeaderboardData(): Promise<LeaderboardData> {
       data: currentUserData,
     },
     totalChallenges,
+    totalModels,
+    maxPossibleSolves,
   };
 }

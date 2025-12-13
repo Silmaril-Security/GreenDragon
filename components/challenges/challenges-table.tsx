@@ -6,8 +6,9 @@ import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useActiveChallenge } from "@/contexts/active-challenge-context";
+import { chatModels } from "@/lib/ai/models";
+import type { ChallengeWithStatus } from "@/lib/challenges/actions";
 import {
-  type Challenge,
   difficultyConfig,
   categoryConfig,
   statusConfig,
@@ -71,7 +72,7 @@ export type SortField = "status" | "title" | "difficulty" | "points";
 export type SortDirection = "asc" | "desc";
 
 interface ChallengesTableProps {
-  challenges: Challenge[];
+  challenges: ChallengeWithStatus[];
   sortField: SortField | null;
   sortDirection: SortDirection;
   onSort: (field: SortField) => void;
@@ -79,6 +80,17 @@ interface ChallengesTableProps {
   totalPages: number;
   totalItems: number;
   onPageChange: (page: number) => void;
+}
+
+// Helper to get model short name from modelId
+function getModelShortName(modelId: string): string {
+  const model = chatModels.find((m) => m.id === modelId);
+  if (!model) return modelId.split("/").pop() || modelId;
+  // Return shortened name (e.g., "Opus 4.5", "GPT-5")
+  return model.name
+    .replace("Claude ", "")
+    .replace("Gemini ", "")
+    .replace("DeepSeek ", "");
 }
 
 function SortableHeader({
@@ -134,7 +146,7 @@ export function ChallengesTable({
   const router = useRouter();
   const { setActiveChallenge } = useActiveChallenge();
 
-  const handleRowClick = (challenge: Challenge) => {
+  const handleRowClick = (challenge: ChallengeWithStatus) => {
     setActiveChallenge(challenge);
     router.push("/");
   };
@@ -229,6 +241,20 @@ export function ChallengesTable({
                           {challenge.points} pts
                         </span>
                       </div>
+                      {challenge.solvedModels.length > 0 && (
+                        <div className="mt-2 flex flex-wrap items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">Solved with:</span>
+                          {challenge.solvedModels.map((sm) => (
+                            <span
+                              key={sm.modelId}
+                              className="rounded bg-green-500/10 px-1.5 py-0.5 text-[10px] text-green-600 dark:text-green-400"
+                              title={`${sm.earnedPoints} pts`}
+                            >
+                              {getModelShortName(sm.modelId)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -251,6 +277,20 @@ export function ChallengesTable({
                       <div className="mt-0.5">
                         <ChallengeDescription description={challenge.description} variant="compact" />
                       </div>
+                      {challenge.solvedModels.length > 0 && (
+                        <div className="mt-1 flex flex-wrap items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">Solved:</span>
+                          {challenge.solvedModels.map((sm) => (
+                            <span
+                              key={sm.modelId}
+                              className="rounded bg-green-500/10 px-1.5 py-0.5 text-[10px] text-green-600 dark:text-green-400"
+                              title={`${sm.earnedPoints} pts`}
+                            >
+                              {getModelShortName(sm.modelId)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {catConfig?.label ?? challenge.category}
