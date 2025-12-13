@@ -570,9 +570,8 @@ function PureModelSelectorCompact({
     setOptimisticModelId(selectedModelId);
   }, [selectedModelId]);
 
-  const selectedModel = chatModels.find(
-    (model) => model.id === optimisticModelId
-  );
+  const selectedModel =
+    chatModels.find((model) => model.id === optimisticModelId) ?? chatModels[0];
 
   return (
     <PromptInputModelSelect
@@ -592,21 +591,33 @@ function PureModelSelectorCompact({
         <Button className="h-8 px-2" variant="ghost">
           <CpuIcon size={16} />
           <span className="hidden font-medium text-xs sm:block">
-            {selectedModel?.name}
+            {selectedModel?.name ?? "Select Model"}
           </span>
           <ChevronDownIcon size={16} />
         </Button>
       </Trigger>
       <PromptInputModelSelectContent className="min-w-[260px] p-0">
         <div className="flex flex-col gap-px">
-          {chatModels.map((model) => (
-            <SelectItem key={model.id} value={model.name}>
-              <div className="truncate font-medium text-xs">{model.name}</div>
-              <div className="mt-px truncate text-[10px] text-muted-foreground leading-tight">
-                {model.description}
+          {chatModels.map((model, index) => {
+            const provider = model.id.split("/")[0];
+            const prevProvider =
+              index > 0 ? chatModels[index - 1].id.split("/")[0] : null;
+            const showDivider = prevProvider && provider !== prevProvider;
+
+            return (
+              <div key={model.id}>
+                {showDivider && (
+                  <div className="my-1 h-px bg-border" />
+                )}
+                <SelectItem value={model.name}>
+                  <div className="truncate font-medium text-xs">{model.name}</div>
+                  <div className="mt-px truncate text-[10px] text-muted-foreground leading-tight">
+                    {model.description}
+                  </div>
+                </SelectItem>
               </div>
-            </SelectItem>
-          ))}
+            );
+          })}
         </div>
       </PromptInputModelSelectContent>
     </PromptInputModelSelect>

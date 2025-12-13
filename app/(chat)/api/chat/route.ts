@@ -21,7 +21,7 @@ import type { VisibilityType } from "@/components/visibility-selector";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
 import type { ChatModel } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
-import { myProvider } from "@/lib/ai/providers";
+import { getLanguageModel } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
@@ -143,6 +143,7 @@ export async function POST(request: Request) {
     } else {
       const title = await generateTitleFromUserMessage({
         message,
+        modelId: selectedChatModel,
       });
 
       await saveChat({
@@ -192,7 +193,7 @@ export async function POST(request: Request) {
     const stream = createUIMessageStream({
       execute: async ({ writer: dataStream }) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
+          model: getLanguageModel(selectedChatModel),
           system: systemPrompt({
             requestHints,
             challengePrompt: activeChallenge?.systemPrompt,
@@ -208,11 +209,12 @@ export async function POST(request: Request) {
           experimental_transform: smoothStream({ chunking: "word" }),
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
+            createDocument: createDocument({ session, dataStream, modelId: selectedChatModel }),
+            updateDocument: updateDocument({ session, dataStream, modelId: selectedChatModel }),
             requestSuggestions: requestSuggestions({
               session,
               dataStream,
+              modelId: selectedChatModel,
             }),
           },
           experimental_telemetry: {
@@ -223,9 +225,8 @@ export async function POST(request: Request) {
             finalResponseText = text;
             try {
               const providers = await getTokenlensCatalog();
-              const modelId =
-                myProvider.languageModel(selectedChatModel).modelId;
-              if (!modelId || !providers) {
+              const modelId = selectedChatModel;
+              if (!providers) {
                 finalMergedUsage = usage;
               } else {
                 const summary = getUsage({ modelId, usage, providers });

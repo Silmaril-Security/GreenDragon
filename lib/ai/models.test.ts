@@ -82,3 +82,11 @@ export const artifactModel = new MockLanguageModelV2({
     rawCall: { rawPrompt: null, rawSettings: {} },
   }),
 });
+
+/**
+ * Get a mock model by ID for testing.
+ * Returns the same mock model for all IDs.
+ */
+export function getMockModel(_modelId: string) {
+  return chatModel;
+}

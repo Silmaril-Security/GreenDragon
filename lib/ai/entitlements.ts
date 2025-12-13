@@ -6,13 +6,29 @@ type Entitlements = {
   availableChatModelIds: ChatModel["id"][];
 };
 
+const allModelIds: ChatModel["id"][] = [
+  "anthropic/claude-opus-4.5",
+  "anthropic/claude-sonnet-4.5",
+  "anthropic/claude-haiku-4.5",
+  "openai/gpt-5",
+  "openai/gpt-5-mini",
+  "google/gemini-3-pro-preview",
+  "google/gemini-2.5-pro",
+  "google/gemini-2.5-flash",
+  "deepseek/deepseek-v3.2",
+  "deepseek/deepseek-r1",
+  "alibaba/qwen3-max",
+  "moonshotai/kimi-k2",
+  "moonshotai/kimi-k2-thinking",
+];
+
 export const entitlementsByUserType: Record<UserType, Entitlements> = {
   /*
    * For users without an account
    */
   guest: {
     maxMessagesPerDay: 20,
-    availableChatModelIds: ["chat-model", "chat-model-reasoning"],
+    availableChatModelIds: allModelIds,
   },
 
   /*
@@ -20,7 +36,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
    */
   regular: {
     maxMessagesPerDay: 100,
-    availableChatModelIds: ["chat-model", "chat-model-reasoning"],
+    availableChatModelIds: allModelIds,
   },
 
   /*
