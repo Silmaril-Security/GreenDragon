@@ -24,6 +24,29 @@ type MessagesProps = {
   onDismissError: () => void;
 };
 
+function hasRenderableContent(messages: ChatMessage[]): boolean {
+  const lastMessage = messages.at(-1);
+  if (!lastMessage || lastMessage.role !== "assistant") {
+    return false;
+  }
+
+  return (
+    lastMessage.parts?.some((part) => {
+      if (part.type === "text" && part.text?.trim()) {
+        return true;
+      }
+      if (part.type === "reasoning" && part.text?.trim()) {
+        return true;
+      }
+      // Only hide thinking for tool-result (completed tools), not tool-invocation
+      if (part.type === "tool-result") {
+        return true;
+      }
+      return false;
+    }) ?? false
+  );
+}
+
 function PureMessages({
   chatId,
   status,
@@ -58,29 +81,44 @@ function PureMessages({
         <div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
           {messages.length === 0 && <Greeting />}
 
-          {messages.map((message, index) => (
-            <PreviewMessage
-              chatId={chatId}
-              isLoading={
-                status === "streaming" && messages.length - 1 === index
-              }
-              isReadonly={isReadonly}
-              key={message.id}
-              message={message}
-              regenerate={regenerate}
-              requiresScrollPadding={
-                hasSentMessage && index === messages.length - 1
-              }
-              setMessages={setMessages}
-              vote={
-                votes
-                  ? votes.find((vote) => vote.messageId === message.id)
-                  : undefined
-              }
-            />
-          ))}
+          {messages.map((message, index) => {
+            // Skip rendering empty assistant messages during streaming
+            // to avoid showing empty bubble before content arrives
+            if (
+              message.role === "assistant" &&
+              index === messages.length - 1 &&
+              status === "streaming" &&
+              !hasRenderableContent(messages)
+            ) {
+              return null;
+            }
 
-          {status === "submitted" && !generationError && <ThinkingMessage />}
+            return (
+              <PreviewMessage
+                chatId={chatId}
+                isLoading={
+                  status === "streaming" && messages.length - 1 === index
+                }
+                isReadonly={isReadonly}
+                key={message.id}
+                message={message}
+                regenerate={regenerate}
+                requiresScrollPadding={
+                  hasSentMessage && index === messages.length - 1
+                }
+                setMessages={setMessages}
+                vote={
+                  votes
+                    ? votes.find((vote) => vote.messageId === message.id)
+                    : undefined
+                }
+              />
+            );
+          })}
+
+          {(status === "submitted" ||
+            (status === "streaming" && !hasRenderableContent(messages))) &&
+            !generationError && <ThinkingMessage />}
 
           {generationError && (
             <ErrorMessage
@@ -118,10 +156,20 @@ export const Messages = memo(PureMessages, (prevProps, nextProps) => {
     return true;
   }
 
+  // Always re-render during active states to show streaming updates
+  if (
+    nextProps.status === "streaming" ||
+    nextProps.status === "submitted" ||
+    prevProps.status === "streaming" ||
+    prevProps.status === "submitted"
+  ) {
+    return false;
+  }
+
   if (prevProps.status !== nextProps.status) {
     return false;
   }
-  if (prevProps.selectedModelId !== nextProps.selectedModelId) {
+  if (prevProps.generationError !== nextProps.generationError) {
     return false;
   }
   if (prevProps.messages.length !== nextProps.messages.length) {
@@ -134,5 +182,5 @@ export const Messages = memo(PureMessages, (prevProps, nextProps) => {
     return false;
   }
 
-  return false;
+  return true;
 });
