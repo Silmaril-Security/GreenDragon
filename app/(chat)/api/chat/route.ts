@@ -189,6 +189,7 @@ export async function POST(request: Request) {
 
     let finalMergedUsage: AppUsage | undefined;
     let finalResponseText = "";
+    const toolOutputs: string[] = [];
 
     const stream = createUIMessageStream({
       execute: async ({ writer: dataStream }) => {
@@ -229,6 +230,16 @@ export async function POST(request: Request) {
             isEnabled: isProductionEnvironment,
             functionId: "stream-text",
           },
+          onStepFinish: activeChallenge
+            ? ({ staticToolCalls, staticToolResults }) => {
+                for (const call of staticToolCalls) {
+                  toolOutputs.push(JSON.stringify(call.input));
+                }
+                for (const result of staticToolResults) {
+                  toolOutputs.push(JSON.stringify(result.output));
+                }
+              }
+            : undefined,
           onFinish: async ({ usage, text }) => {
             finalResponseText = text;
             try {
@@ -277,7 +288,8 @@ export async function POST(request: Request) {
             if (!alreadySolved) {
               const validationResult = validateResponse(
                 finalResponseText,
-                activeChallenge
+                activeChallenge,
+                toolOutputs.length > 0 ? toolOutputs : undefined
               );
 
               if (validationResult.success) {

@@ -62,7 +62,7 @@ export const createDocument = ({
         throw new Error(`No document handler found for kind: ${kind}`);
       }
 
-      await documentHandler.onCreateDocument({
+      const content = await documentHandler.onCreateDocument({
         id,
         title,
         dataStream,
@@ -76,7 +76,7 @@ export const createDocument = ({
         id,
         title,
         kind,
-        content: "A document was created and is now visible to the user.",
+        content,
       };
     },
   });

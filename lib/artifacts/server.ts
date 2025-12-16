@@ -34,8 +34,8 @@ export type UpdateDocumentCallbackProps = {
 
 export type DocumentHandler<T = ArtifactKind> = {
   kind: T;
-  onCreateDocument: (args: CreateDocumentCallbackProps) => Promise<void>;
-  onUpdateDocument: (args: UpdateDocumentCallbackProps) => Promise<void>;
+  onCreateDocument: (args: CreateDocumentCallbackProps) => Promise<string>;
+  onUpdateDocument: (args: UpdateDocumentCallbackProps) => Promise<string>;
 };
 
 export function createDocumentHandler<T extends ArtifactKind>(config: {
@@ -70,7 +70,7 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
         userId: args.session.user.id,
       });
 
-      return;
+      return draftContent;
     },
     onUpdateDocument: async (args: UpdateDocumentCallbackProps) => {
       const draftContent = await config.onUpdateDocument({
@@ -97,7 +97,7 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
         userId: args.session.user.id,
       });
 
-      return;
+      return draftContent;
     },
   };
 }

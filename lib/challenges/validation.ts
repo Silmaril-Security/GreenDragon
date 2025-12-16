@@ -7,15 +7,21 @@ export type ValidationResult = {
 
 export function validateResponse(
   response: string,
-  challenge: Challenge
+  challenge: Challenge,
+  toolOutputs?: string[]
 ): ValidationResult {
+  // Combine response with tool outputs for validation
+  const combinedText = toolOutputs
+    ? [response, ...toolOutputs].join("\n")
+    : response;
+
   switch (challenge.successType) {
     case "response_contains":
-      return validateContains(response, challenge.successValue);
+      return validateContains(combinedText, challenge.successValue);
     case "response_regex":
-      return validateRegex(response, challenge.successValue);
+      return validateRegex(combinedText, challenge.successValue);
     case "custom":
-      return validateCustom(response, challenge.successValue);
+      return validateCustom(combinedText, challenge.successValue);
     default:
       return { success: false };
   }

@@ -48,7 +48,7 @@ export const updateDocument = ({
         throw new Error(`No document handler found for kind: ${document.kind}`);
       }
 
-      await documentHandler.onUpdateDocument({
+      const content = await documentHandler.onUpdateDocument({
         document,
         description,
         dataStream,
@@ -62,7 +62,7 @@ export const updateDocument = ({
         id,
         title: document.title,
         kind: document.kind,
-        content: "The document has been updated successfully.",
+        content,
       };
     },
   });
