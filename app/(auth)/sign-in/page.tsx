@@ -51,12 +51,9 @@ export default function Page() {
 
   return (
     <div className="flex h-dvh w-screen items-start justify-center bg-background pt-12 md:items-center md:pt-0">
-      <div className="flex w-full max-w-md flex-col gap-12 overflow-hidden rounded-2xl">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="font-semibold text-xl dark:text-zinc-50">Sign In</h3>
-          <p className="text-gray-500 text-sm dark:text-zinc-400">
-            Use your email and password to sign in
-          </p>
+      <div className="flex w-full max-w-md flex-col gap-6 overflow-hidden rounded-2xl">
+        <div className="flex flex-col px-4 sm:px-16">
+          <h3 className="font-semibold text-3xl dark:text-zinc-50">Sign In</h3>
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
