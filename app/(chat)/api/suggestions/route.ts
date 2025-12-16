@@ -23,15 +23,10 @@ export async function GET(request: Request) {
     documentId,
   });
 
-  const [suggestion] = suggestions;
+  // Filter ALL suggestions by userId, not just the first one
+  const userSuggestions = suggestions.filter(
+    (s) => s.userId === session.user.id
+  );
 
-  if (!suggestion) {
-    return Response.json([], { status: 200 });
-  }
-
-  if (suggestion.userId !== session.user.id) {
-    return new ChatSDKError("forbidden:api").toResponse();
-  }
-
-  return Response.json(suggestions, { status: 200 });
+  return Response.json(userSuggestions, { status: 200 });
 }

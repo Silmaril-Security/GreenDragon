@@ -51,9 +51,11 @@ export async function POST(request: Request) {
     const fileBuffer = await file.arrayBuffer();
 
     try {
-      const data = await put(`${filename}`, fileBuffer, {
-        access: "public",
-      });
+      const data = await put(
+        `${crypto.randomUUID()}/${filename}`,
+        fileBuffer,
+        { access: "public" }
+      );
 
       return NextResponse.json(data);
     } catch (_error) {

@@ -71,7 +71,12 @@ export class ChatSDKError extends Error {
       );
     }
 
-    return Response.json({ code, message, cause }, { status: statusCode });
+    // Log cause server-side but don't expose to client
+    if (cause) {
+      console.error({ code, message, cause });
+    }
+
+    return Response.json({ code, message }, { status: statusCode });
   }
 }
 

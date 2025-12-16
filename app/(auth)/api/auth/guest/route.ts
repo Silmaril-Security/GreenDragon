@@ -7,6 +7,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectUrl = searchParams.get("redirectUrl") || "/";
 
+  // Prevent open redirect - only allow relative paths
+  const safeRedirect =
+    redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")
+      ? redirectUrl
+      : "/";
+
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
@@ -17,5 +23,5 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return signIn("guest", { redirect: true, redirectTo: redirectUrl });
+  return signIn("guest", { redirect: true, redirectTo: safeRedirect });
 }

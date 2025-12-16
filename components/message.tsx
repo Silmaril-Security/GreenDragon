@@ -84,16 +84,21 @@ const PurePreviewMessage = ({
               className="flex flex-row justify-end gap-2"
               data-testid={"message-attachments"}
             >
-              {attachmentsFromMessage.map((attachment) => (
-                <PreviewAttachment
-                  attachment={{
-                    name: attachment.filename ?? "file",
-                    contentType: attachment.mediaType,
-                    url: attachment.url,
-                  }}
-                  key={attachment.url}
-                />
-              ))}
+              {attachmentsFromMessage.map((attachment) => {
+                // Extract filename from URL path, stripping any UUID prefix
+                const urlPath = new URL(attachment.url).pathname;
+                const filename = urlPath.split("/").pop() ?? "file";
+                return (
+                  <PreviewAttachment
+                    attachment={{
+                      name: filename,
+                      contentType: attachment.mediaType,
+                      url: attachment.url,
+                    }}
+                    key={attachment.url}
+                  />
+                );
+              })}
             </div>
           )}
 

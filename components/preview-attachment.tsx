@@ -14,6 +14,7 @@ export const PreviewAttachment = ({
   onRemove?: () => void;
 }) => {
   const { name, url, contentType } = attachment;
+  const displayName = name?.split("/").pop() ?? name;
 
   return (
     <div
@@ -22,7 +23,7 @@ export const PreviewAttachment = ({
     >
       {contentType?.startsWith("image") ? (
         <Image
-          alt={name ?? "An image attachment"}
+          alt={displayName ?? "An image attachment"}
           className="size-full object-cover"
           height={64}
           src={url}
@@ -55,7 +56,7 @@ export const PreviewAttachment = ({
       )}
 
       <div className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/80 to-transparent px-1 py-0.5 text-[10px] text-white">
-        {name}
+        {displayName}
       </div>
     </div>
   );
