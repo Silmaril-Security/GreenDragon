@@ -367,7 +367,7 @@ function PureMultimodalInput({
       {/* Header row with challenge info and Challenges link - invisible when popover is open */}
       <div
         className={cn(
-          "flex items-center justify-between",
+          "flex items-center justify-between pt-2",
           showCommandPopover && "invisible"
         )}
       >
@@ -611,7 +611,7 @@ function PureModelSelectorCompact({
           <ChevronDownIcon size={16} />
         </Button>
       </Trigger>
-      <PromptInputModelSelectContent className="min-w-[260px] p-0">
+      <PromptInputModelSelectContent className="min-w-[260px] max-h-[50vh] p-0">
         <div className="flex flex-col gap-px">
           {chatModels.map((model, index) => {
             const provider = model.id.split("/")[0];

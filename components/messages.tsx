@@ -68,6 +68,7 @@ function PureMessages({
     hasSentMessage,
   } = useMessages({
     status,
+    messageCount: messages.length,
   });
 
   useDataStream();

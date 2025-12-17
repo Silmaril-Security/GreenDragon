@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useScrollToBottom() {
+export function useScrollToBottom({ hasMessages = true }: { hasMessages?: boolean } = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -70,8 +70,8 @@ export function useScrollToBottom() {
     }
 
     const scrollIfNeeded = () => {
-      // Only auto-scroll if user was at bottom and isn't actively scrolling
-      if (isAtBottomRef.current && !isUserScrollingRef.current) {
+      // Only auto-scroll if there are messages, user was at bottom, and isn't actively scrolling
+      if (hasMessages && isAtBottomRef.current && !isUserScrollingRef.current) {
         requestAnimationFrame(() => {
           container.scrollTo({
             top: container.scrollHeight,
@@ -104,7 +104,7 @@ export function useScrollToBottom() {
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [hasMessages]);
 
   function onViewportEnter() {
     setIsAtBottom(true);

@@ -5,8 +5,10 @@ import { useScrollToBottom } from "./use-scroll-to-bottom";
 
 export function useMessages({
   status,
+  messageCount,
 }: {
   status: UseChatHelpers<ChatMessage>["status"];
+  messageCount: number;
 }) {
   const {
     containerRef,
@@ -15,7 +17,7 @@ export function useMessages({
     scrollToBottom,
     onViewportEnter,
     onViewportLeave,
-  } = useScrollToBottom();
+  } = useScrollToBottom({ hasMessages: messageCount > 0 });
 
   const [hasSentMessage, setHasSentMessage] = useState(false);
 

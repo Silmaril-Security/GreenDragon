@@ -36,6 +36,7 @@ function PureArtifactMessages({
     hasSentMessage,
   } = useMessages({
     status,
+    messageCount: messages.length,
   });
 
   return (
