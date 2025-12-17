@@ -59,6 +59,24 @@ Token for Vercel Blob storage. Get this from your Vercel project settings under 
 
 Your Vercel Redis connection URL. Get this from your Vercel project settings under Storage > Redis.
 
+#### ALLOWED_ORIGINS
+
+Comma-separated list of domains allowed to make cross-origin requests to the API. This prevents other websites from using Green Dragon's API as their backend.
+
+For local development:
+
+```
+ALLOWED_ORIGINS=http://localhost:3000
+```
+
+For production, include your deployed domain:
+
+```
+ALLOWED_ORIGINS=https://your-domain.com,http://localhost:3000
+```
+
+Vercel preview deployment URLs are automatically allowed via the `VERCEL_URL` environment variable.
+
 #### AI_GATEWAY_API_KEY
 
 Your Vercel AI Gateway API key. Get this from [vercel.com/ai-gateway](https://vercel.com/ai-gateway).

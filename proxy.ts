@@ -1,9 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import {
+  getCorsHeaders,
+  isOriginAllowed,
+  isProtectedApiPath,
+} from "@/lib/cors";
 import { isDevelopmentEnvironment } from "./lib/constants";
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const origin = request.headers.get("origin");
 
   /*
    * Playwright starts the dev server and requires a 200 status to
@@ -13,8 +19,37 @@ export async function proxy(request: NextRequest) {
     return new Response("pong", { status: 200 });
   }
 
+  // CORS handling for API routes
+  if (isProtectedApiPath(pathname)) {
+    // Handle preflight OPTIONS requests
+    if (request.method === "OPTIONS") {
+      if (origin && isOriginAllowed(origin)) {
+        return new NextResponse(null, {
+          status: 204,
+          headers: getCorsHeaders(origin),
+        });
+      }
+      return new NextResponse(null, { status: 403 });
+    }
+
+    // Block cross-origin requests from disallowed origins
+    if (origin && !isOriginAllowed(origin)) {
+      return new NextResponse(
+        JSON.stringify({
+          code: "forbidden:cors",
+          message: "Cross-origin request from disallowed origin",
+        }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+  }
+
+  // Skip auth check for auth routes
   if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
+    return addCorsHeaders(NextResponse.next(), origin);
   }
 
   const token = await getToken({
@@ -37,7 +72,23 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next();
+  return addCorsHeaders(NextResponse.next(), origin);
+}
+
+/**
+ * Add CORS headers to response if origin is allowed
+ */
+function addCorsHeaders(
+  response: NextResponse,
+  origin: string | null
+): NextResponse {
+  if (origin && isOriginAllowed(origin)) {
+    const corsHeaders = getCorsHeaders(origin);
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      response.headers.set(key, value);
+    }
+  }
+  return response;
 }
 
 export const config = {
