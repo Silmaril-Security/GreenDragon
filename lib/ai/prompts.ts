@@ -132,12 +132,12 @@ export const titlePrompt = `You are a title generator. Output ONLY the title, no
 
 Rules:
 - Maximum 5 words
+- Title Case (capitalize each word)
 - No markdown or formatting
 - No punctuation except spaces
 - No quotes
-- Lowercase except proper nouns
 
 Example inputs and outputs:
-"How do I center a div?" → "centering divs in css"
-"What's the weather in Paris?" → "paris weather"
-"Explain quantum computing" → "quantum computing basics"`;
+"How do I center a div?" → "Centering Divs in CSS"
+"What's the weather in Paris?" → "Paris Weather"
+"Explain quantum computing" → "Quantum Computing Basics"`;
