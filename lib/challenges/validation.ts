@@ -37,7 +37,7 @@ function validateContains(response: string, value: string): ValidationResult {
 function validateRegex(response: string, pattern: string): ValidationResult {
   try {
     // Limit response length to prevent ReDoS on very long inputs
-    const truncatedResponse = response.slice(0, 50000);
+    const truncatedResponse = response.slice(0, 50_000);
     const regex = new RegExp(pattern, "i");
     const match = truncatedResponse.match(regex);
     return { success: !!match, matchedText: match?.[0] };

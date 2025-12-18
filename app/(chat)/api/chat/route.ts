@@ -235,8 +235,8 @@ export async function POST(request: Request) {
                 for (const call of staticToolCalls) {
                   toolOutputs.push(JSON.stringify(call.input));
                 }
-                for (const result of staticToolResults) {
-                  toolOutputs.push(JSON.stringify(result.output));
+                for (const toolResult of staticToolResults) {
+                  toolOutputs.push(JSON.stringify(toolResult.output));
                 }
               }
             : undefined,

@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useScrollToBottom({ hasMessages = true }: { hasMessages?: boolean } = {}) {
+export function useScrollToBottom({
+  hasMessages = true,
+}: {
+  hasMessages?: boolean;
+} = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
