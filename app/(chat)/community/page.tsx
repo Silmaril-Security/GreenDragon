@@ -30,7 +30,7 @@ export default function CommunityPage() {
               </p>
               <Button asChild className="w-full sm:w-auto" size="lg">
                 <a
-                  href="https://discord.gg/8VSKYDh6"
+                  href="https://discord.gg/JYeu2W76Ea"
                   rel="noopener noreferrer"
                   target="_blank"
                 >

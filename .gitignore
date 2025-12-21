@@ -18,6 +18,7 @@ next-env.d.ts
 .DS_Store
 *.pem
 .idea/
+.claude/
 tsconfig.tsbuildinfo
 
 # debug
