@@ -40,6 +40,12 @@ export const chatModels: ChatModel[] = [
     description: "Smaller, faster GPT-5 variant",
     multiplier: 1.0,
   },
+  {
+    id: "openai/gpt-4.1",
+    name: "GPT-4.1",
+    description: "OpenAI's latest GPT-4.1 model",
+    multiplier: 1.0,
+  },
   // Google
   {
     id: "google/gemini-3-pro-preview",

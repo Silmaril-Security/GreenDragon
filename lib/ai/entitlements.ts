@@ -12,6 +12,7 @@ const allModelIds: ChatModel["id"][] = [
   "anthropic/claude-haiku-4.5",
   "openai/gpt-5",
   "openai/gpt-5-mini",
+  "openai/gpt-4.1",
   "google/gemini-3-pro-preview",
   "google/gemini-2.5-pro",
   "google/gemini-2.5-flash",
