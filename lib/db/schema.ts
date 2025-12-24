@@ -249,3 +249,74 @@ export const challengeProgress = pgTable(
 );
 
 export type ChallengeProgress = InferSelectModel<typeof challengeProgress>;
+
+// Learn types
+export type CourseDifficulty =
+  | "novice"
+  | "easy"
+  | "medium"
+  | "hard"
+  | "nightmare";
+
+export const course = pgTable("Course", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  slug: varchar("slug", { length: 64 }).notNull().unique(),
+  title: varchar("title", { length: 128 }).notNull(),
+  subtitle: varchar("subtitle", { length: 256 }),
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 64 }),
+  difficulty: varchar("difficulty", { length: 16 }).$type<CourseDifficulty>(),
+  tags: text("tags").array(),
+  isFeatured: boolean("isFeatured").notNull().default(false),
+  sortOrder: integer("sortOrder").notNull().default(0),
+  isActive: boolean("isActive").notNull().default(true),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+});
+
+export type Course = InferSelectModel<typeof course>;
+
+export const module = pgTable(
+  "Module",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    courseId: uuid("courseId")
+      .notNull()
+      .references(() => course.id, { onDelete: "cascade" }),
+    slug: varchar("slug", { length: 64 }).notNull(),
+    title: varchar("title", { length: 128 }).notNull(),
+    description: text("description"),
+    difficulty: varchar("difficulty", { length: 16 }).$type<CourseDifficulty>(),
+    sortOrder: integer("sortOrder").notNull().default(0),
+    isActive: boolean("isActive").notNull().default(true),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+  },
+  (table) => ({
+    courseSlugUnique: unique().on(table.courseId, table.slug),
+    courseIdx: index("module_course_idx").on(table.courseId),
+  })
+);
+
+export type Module = InferSelectModel<typeof module>;
+
+export const lesson = pgTable(
+  "Lesson",
+  {
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    moduleId: uuid("moduleId")
+      .notNull()
+      .references(() => module.id, { onDelete: "cascade" }),
+    slug: varchar("slug", { length: 64 }).notNull(),
+    title: varchar("title", { length: 128 }).notNull(),
+    content: text("content").notNull(),
+    estimatedMinutes: integer("estimatedMinutes").default(5),
+    sortOrder: integer("sortOrder").notNull().default(0),
+    isActive: boolean("isActive").notNull().default(true),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+  },
+  (table) => ({
+    moduleSlugUnique: unique().on(table.moduleId, table.slug),
+    moduleIdx: index("lesson_module_idx").on(table.moduleId),
+  })
+);
+
+export type Lesson = InferSelectModel<typeof lesson>;

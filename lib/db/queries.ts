@@ -24,12 +24,18 @@ import {
   type Challenge,
   type ChallengeProgress,
   type Chat,
+  type Course,
+  type Lesson,
+  type Module,
   challenge,
   challengeProgress,
   chat,
+  course,
   type DBMessage,
   document,
+  lesson,
   message,
+  module,
   type Suggestion,
   stream,
   suggestion,
@@ -891,6 +897,249 @@ export async function transferGuestProgress({
     throw new ChatSDKError(
       "bad_request:database",
       "Failed to transfer guest progress"
+    );
+  }
+}
+
+// Learn queries
+
+export async function getLearnCourses(): Promise<Course[]> {
+  try {
+    return await db
+      .select()
+      .from(course)
+      .where(eq(course.isActive, true))
+      .orderBy(asc(course.sortOrder));
+  } catch (_error) {
+    throw new ChatSDKError("bad_request:database", "Failed to get courses");
+  }
+}
+
+export async function getFeaturedCourse(): Promise<Course | null> {
+  try {
+    const [featured] = await db
+      .select()
+      .from(course)
+      .where(and(eq(course.isActive, true), eq(course.isFeatured, true)))
+      .limit(1);
+    return featured || null;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get featured course"
+    );
+  }
+}
+
+export async function getCourseBySlug(slug: string): Promise<Course | null> {
+  try {
+    const [result] = await db
+      .select()
+      .from(course)
+      .where(and(eq(course.slug, slug), eq(course.isActive, true)));
+    return result || null;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get course by slug"
+    );
+  }
+}
+
+export async function getModulesByCourse(courseId: string): Promise<Module[]> {
+  try {
+    return await db
+      .select()
+      .from(module)
+      .where(and(eq(module.courseId, courseId), eq(module.isActive, true)))
+      .orderBy(asc(module.sortOrder));
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get modules by course"
+    );
+  }
+}
+
+export async function getLessonsByModule(moduleId: string): Promise<Lesson[]> {
+  try {
+    return await db
+      .select()
+      .from(lesson)
+      .where(and(eq(lesson.moduleId, moduleId), eq(lesson.isActive, true)))
+      .orderBy(asc(lesson.sortOrder));
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get lessons by module"
+    );
+  }
+}
+
+export async function getModuleBySlug(
+  courseId: string,
+  slug: string
+): Promise<Module | null> {
+  try {
+    const [result] = await db
+      .select()
+      .from(module)
+      .where(
+        and(
+          eq(module.courseId, courseId),
+          eq(module.slug, slug),
+          eq(module.isActive, true)
+        )
+      );
+    return result || null;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get module by slug"
+    );
+  }
+}
+
+export async function getLessonBySlug(
+  moduleId: string,
+  slug: string
+): Promise<Lesson | null> {
+  try {
+    const [result] = await db
+      .select()
+      .from(lesson)
+      .where(
+        and(
+          eq(lesson.moduleId, moduleId),
+          eq(lesson.slug, slug),
+          eq(lesson.isActive, true)
+        )
+      );
+    return result || null;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get lesson by slug"
+    );
+  }
+}
+
+export async function getAdjacentLessons(
+  moduleId: string,
+  sortOrder: number
+): Promise<{ prev: Lesson | null; next: Lesson | null }> {
+  try {
+    // First, try to find prev/next within the same module
+    const [prevInModule] = await db
+      .select()
+      .from(lesson)
+      .where(
+        and(
+          eq(lesson.moduleId, moduleId),
+          lt(lesson.sortOrder, sortOrder),
+          eq(lesson.isActive, true)
+        )
+      )
+      .orderBy(desc(lesson.sortOrder))
+      .limit(1);
+
+    const [nextInModule] = await db
+      .select()
+      .from(lesson)
+      .where(
+        and(
+          eq(lesson.moduleId, moduleId),
+          gt(lesson.sortOrder, sortOrder),
+          eq(lesson.isActive, true)
+        )
+      )
+      .orderBy(asc(lesson.sortOrder))
+      .limit(1);
+
+    let prev = prevInModule || null;
+    let next = nextInModule || null;
+
+    // If no adjacent lessons in this module, look in adjacent modules
+    if (!prev || !next) {
+      // Get the current module's info
+      const [currentModule] = await db
+        .select()
+        .from(module)
+        .where(eq(module.id, moduleId))
+        .limit(1);
+
+      if (currentModule) {
+        // If no previous lesson in module, get last lesson of previous module
+        if (!prev) {
+          const [prevModule] = await db
+            .select()
+            .from(module)
+            .where(
+              and(
+                eq(module.courseId, currentModule.courseId),
+                lt(module.sortOrder, currentModule.sortOrder),
+                eq(module.isActive, true)
+              )
+            )
+            .orderBy(desc(module.sortOrder))
+            .limit(1);
+
+          if (prevModule) {
+            const [lastLessonOfPrevModule] = await db
+              .select()
+              .from(lesson)
+              .where(
+                and(
+                  eq(lesson.moduleId, prevModule.id),
+                  eq(lesson.isActive, true)
+                )
+              )
+              .orderBy(desc(lesson.sortOrder))
+              .limit(1);
+
+            prev = lastLessonOfPrevModule || null;
+          }
+        }
+
+        // If no next lesson in module, get first lesson of next module
+        if (!next) {
+          const [nextModule] = await db
+            .select()
+            .from(module)
+            .where(
+              and(
+                eq(module.courseId, currentModule.courseId),
+                gt(module.sortOrder, currentModule.sortOrder),
+                eq(module.isActive, true)
+              )
+            )
+            .orderBy(asc(module.sortOrder))
+            .limit(1);
+
+          if (nextModule) {
+            const [firstLessonOfNextModule] = await db
+              .select()
+              .from(lesson)
+              .where(
+                and(
+                  eq(lesson.moduleId, nextModule.id),
+                  eq(lesson.isActive, true)
+                )
+              )
+              .orderBy(asc(lesson.sortOrder))
+              .limit(1);
+
+            next = firstLessonOfNextModule || null;
+          }
+        }
+      }
+    }
+
+    return { prev, next };
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get adjacent lessons"
     );
   }
 }

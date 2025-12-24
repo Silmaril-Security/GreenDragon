@@ -1,6 +1,6 @@
 "use client";
 
-import { Bug, Medal, SquarePen, Users } from "lucide-react";
+import { BookOpen, Bug, Medal, SquarePen, Users } from "lucide-react";
 import Link from "next/link";
 import type { User } from "next-auth";
 import { SilmarilIcon } from "@/components/icons";
@@ -77,6 +77,14 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <Link href="/community" onClick={() => setOpenMobile(false)}>
                   <Users className="size-4" />
                   <span>Community</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/learn" onClick={() => setOpenMobile(false)}>
+                  <BookOpen className="size-4" />
+                  <span>Learn</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

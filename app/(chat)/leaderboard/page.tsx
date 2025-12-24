@@ -10,7 +10,7 @@ export default async function LeaderboardPage() {
   return (
     <div className="flex h-full flex-col overflow-auto">
       <PageHeader />
-      <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-6 md:py-8">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">
         <div className="mb-8">
           <h1 className="font-bold text-2xl md:text-3xl">Leaderboard</h1>
         </div>

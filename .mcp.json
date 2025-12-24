@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "arxiv-mcp-server": {
+      "command": "/Users/eduardo/.local/bin/uv",
+      "args": [
+        "tool",
+        "run",
+        "arxiv-mcp-server",
+        "--storage-path",
+        "/Users/eduardo/.arxiv-mcp-server/papers"
+      ]
+    }
+  }
+}
