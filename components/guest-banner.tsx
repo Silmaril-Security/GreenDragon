@@ -16,7 +16,7 @@ export function GuestBanner() {
     <div className="fixed right-4 bottom-4 left-4 z-50 sm:left-auto">
       <div className="flex items-center gap-3 rounded-lg border bg-background px-4 py-2 shadow-lg">
         <p className="text-muted-foreground text-sm">
-          Playing as guest.{" "}
+          Hacking as guest.{" "}
           <Link
             className="font-medium text-foreground underline underline-offset-4 hover:no-underline"
             href="/sign-up"

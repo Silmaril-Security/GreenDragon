@@ -94,16 +94,22 @@ export const lessons = [
     moduleSlug: "foundation",
     slug: "ai-security-paradigm",
     title: "The AI Security Paradigm",
-    estimatedMinutes: 15,
+    estimatedMinutes: 12,
     sortOrder: 1,
     isActive: true,
     content: `## The Paradigm Shift
 
-AI security represents a fundamental departure from traditional cybersecurity. Unlike conventional software where inputs and outputs are deterministic, large language models operate in a probabilistic space where the boundary between data and instructions is inherently blurred.
+For decades, security professionals operated under a core assumption: code executes instructions, data gets processed. Firewalls inspect packets. Input validation rejects malformed data. Access controls restrict resources. These defenses work because we can draw clear lines between what the system does and what it operates on.
+
+Large language models break this assumption completely. An LLM reads tokens in a context window and predicts what comes next. Whether those tokens represent a system prompt, user input, or retrieved documents from a database - the model treats them identically. There is no architectural separation between instruction and data. This single fact underlies nearly every vulnerability in the OWASP LLM Top 10.
+
+The security implications are severe. Traditional input validation checks for SQL injection patterns, script tags, or buffer overflow attempts. But how do you filter for "please ignore previous instructions"? The attack payload is grammatically correct natural language. The model cannot distinguish it from legitimate input because, mechanically, there is no difference.
 
 > **Key Insight**: According to [HiddenLayer's 2025 AI Threat Landscape Report](https://hiddenlayer.com/threatreport2025/), **74% of organizations experienced confirmed AI breaches** in 2024, up from 67% the previous year. Only 32% have deployed defensive technology solutions.
 
 ## Traditional vs. AI Security
+
+The following diagram illustrates the fundamental architectural difference. Traditional systems process inputs through deterministic validation - they either pass or fail defined rules. AI systems process inputs probabilistically, generating outputs based on learned patterns. This means identical inputs can produce different outputs, and the system can exhibit behaviors never explicitly programmed.
 
 \`\`\`mermaid
 graph LR
@@ -133,11 +139,13 @@ graph LR
 
 ## The Instruction-Data Conflation Problem
 
-In traditional computing, we have clear distinctions:
-- **Code** tells the system what to do
-- **Data** is what the system operates on
+Understanding why LLMs are vulnerable requires understanding how they process text. When you send a message to an LLM, your input joins other text in a context window: system prompts set by developers, conversation history, and potentially retrieved documents from external sources. The model processes this entire context as a single sequence of tokens.
 
-In LLM applications, this boundary dissolves completely. Consider this architecture:
+In traditional computing, code and data occupy separate memory regions with different permissions. The CPU executes instructions from code segments and reads values from data segments. This separation is hardware-enforced.
+
+LLMs have no such separation. System prompts, user messages, and retrieved content all become tokens in the same attention mechanism. The model attends to all of them equally when generating its next token. This architecture enables the flexibility that makes LLMs useful - but it also makes injection attacks possible.
+
+Consider this architecture:
 
 \`\`\`mermaid
 graph TD
@@ -154,11 +162,13 @@ graph TD
     style B fill:#4ecdc4,stroke:#333
 \`\`\`
 
-Every red node is a potential injection point. The model cannot inherently distinguish between "process this data" and "follow these instructions."
+Every red node is a potential injection point. User input (red) can contain malicious instructions. Retrieved documents (also red) might have been poisoned by attackers. Only the system prompt (green) is under developer control - and even that can be extracted or overridden through various techniques.
+
+The model processes all of this text through the same transformer architecture. It has no way to tag certain tokens as "trust this" and others as "treat with suspicion." Any text can influence the model's behavior if it's sufficiently persuasive in the statistical sense.
 
 ## 2025 Industry Statistics
 
-From the [HiddenLayer 2025 Report](https://hiddenlayer.com/threatreport2025/):
+These statistics from the [HiddenLayer 2025 Report](https://hiddenlayer.com/threatreport2025/) quantify the gap between AI adoption and AI security maturity. Organizations are deploying models faster than they can secure them:
 
 | Metric | Value |
 |--------|-------|
@@ -172,6 +182,8 @@ From the [HiddenLayer 2025 Report](https://hiddenlayer.com/threatreport2025/):
 | Shadow AI flagged as major risk | **72%** |
 
 ## Threat Actor Landscape
+
+Different threat actors target LLM systems for different reasons, using different techniques. Script kiddies and red teams focus on prompt injection because it requires no special access - just the ability to interact with the model. Nation states invest in supply chain attacks and data poisoning because these provide persistent access. The following diagram maps actors to their typical attack vectors:
 
 \`\`\`mermaid
 graph TB
@@ -203,27 +215,27 @@ graph TB
 
 ## Why This Course Matters
 
-The OWASP LLM Top 10 exists because these aren't theoretical concerns. Real-world applications have been compromised through:
+The OWASP LLM Top 10 exists because production systems are being compromised today. Customer-facing chatbots have been manipulated through direct prompt injection to reveal internal processes and credentials. RAG systems have retrieved poisoned documents containing hidden instructions. Agentic systems have been convinced to execute unauthorized actions. These are documented incidents, not theoretical concerns.
 
-- **Direct prompt injection** in customer-facing chatbots
-- **Indirect injection** via poisoned documents in RAG systems
-- **Tool abuse** through carefully crafted agentic requests
-- **Data exfiltration** through model responses
-- **AI-orchestrated attacks** performing 80-90% of campaigns autonomously ([Anthropic, Sept 2025](https://www.anthropic.com/news/disrupting-AI-espionage))
+The attack surface continues to expand. Anthropic reported in September 2025 that they are observing AI-orchestrated attack campaigns where the AI performs 80-90% of the work autonomously - from initial reconnaissance to payload delivery. Defenders face adversaries who can scale attacks through automation while exploiting the fundamental ambiguity between instructions and data.
 
-Understanding this paradigm is essential before diving into specific vulnerabilities and attack techniques.`,
+This course covers each category of the OWASP LLM Top 10, providing both attack techniques and defensive strategies. The goal is to give you a working understanding of how these vulnerabilities operate so you can identify and mitigate them in real systems.`,
   },
   {
     courseSlug: "ai-risk-course",
     moduleSlug: "foundation",
     slug: "owasp-llm-top-10-2025",
     title: "OWASP LLM Top 10 (2025)",
-    estimatedMinutes: 20,
+    estimatedMinutes: 15,
     sortOrder: 2,
     isActive: true,
     content: `## Overview
 
-The [OWASP Top 10 for LLM Applications 2025](https://owasp.org/www-project-top-10-for-large-language-model-applications/) represents the security community's consensus on the most critical risks facing LLM deployments. The 2025 edition includes significant updates reflecting the rapid evolution of AI applications.
+The [OWASP Top 10 for LLM Applications 2025](https://owasp.org/www-project-top-10-for-large-language-model-applications/) emerged from collective analysis of real-world incidents, academic research, and practitioner experience across the security community. Unlike the traditional OWASP Top 10 for web applications - which has stabilized over two decades - the LLM Top 10 changes significantly between versions as the technology and attack landscape evolve.
+
+The 2025 edition reflects a year of rapid change. Agentic AI systems moved from research to production. RAG architectures became the default for enterprise deployments. Multimodal models introduced new attack surfaces. The ranking and scope of vulnerabilities shifted to match these developments.
+
+Understanding this taxonomy provides a framework for assessing LLM deployments. Each category identifies a distinct risk class with specific attack patterns and mitigations. The rest of this course examines each category in depth.
 
 ## Complete OWASP LLM Top 10 (2025)
 
@@ -242,19 +254,25 @@ The [OWASP Top 10 for LLM Applications 2025](https://owasp.org/www-project-top-1
 
 ## Key Changes for 2025
 
+The 2025 update introduces two new categories and significantly expands others based on observed attack patterns.
+
 ### New Categories
 
-**LLM07: System Prompt Leakage** - Recognition that system prompts often contain sensitive business logic, security instructions, and sometimes credentials. Attackers can use leaked prompts to craft more effective attacks.
+**LLM07: System Prompt Leakage** addresses a problem that became impossible to ignore: developers store sensitive information in system prompts. This includes business logic, security rules, API keys, database connection strings, and instructions that reveal how to bypass controls. When attackers extract these prompts - through methods ranging from simple requests to encoding tricks - they gain reconnaissance data that enables more targeted attacks.
 
-**LLM08: Vector and Embedding Weaknesses** - With 53% of companies using RAG instead of fine-tuning, vulnerabilities in vector databases and embedding pipelines have become critical attack surfaces.
+**LLM08: Vector and Embedding Weaknesses** reflects the dominance of RAG architectures. When 53% of companies use retrieval-augmented generation rather than fine-tuning, the vector database becomes a critical attack surface. Poisoning the embedding space, manipulating retrieval results, or exploiting embedding model vulnerabilities can compromise systems without ever touching the LLM itself.
 
 ### Expanded Categories
 
-**LLM06: Excessive Agency** - Significantly expanded for agentic AI systems. As [OWASP notes](https://genai.owasp.org/2025/12/09/owasp-genai-security-project-releases-top-10-risks-and-mitigations-for-agentic-ai-security/):
+**LLM06: Excessive Agency** underwent the largest revision. When LLMs only generated text, agency risks were limited. With tool use, code execution, and multi-step planning, the attack surface expands dramatically. An LLM that can send emails, query databases, and call APIs becomes a target for privilege escalation. The confused deputy problem - where a trusted system is tricked into misusing its privileges - applies directly to agentic AI.
+
+From [OWASP's announcement](https://genai.owasp.org/2025/12/09/owasp-genai-security-project-releases-top-10-risks-and-mitigations-for-agentic-ai-security/):
 
 > "As 2025 emerges as the 'year of LLM agents,' many applications are being granted unprecedented levels of autonomy. This shift has necessitated significant expansions on excessive agency risks."
 
 ## Vulnerability Taxonomy
+
+The following diagram organizes vulnerabilities by attack surface. Input attacks target how users and external data interact with the model. Data attacks compromise the information the model accesses or outputs. Architecture attacks exploit how the system is built. Operational risks emerge from how the system behaves in production.
 
 \`\`\`mermaid
 graph TB
@@ -280,7 +298,9 @@ graph TB
 
 ## OWASP Top 10 for Agentic Applications (Dec 2025)
 
-In December 2025, OWASP released a companion list specifically for agentic AI systems:
+The rapid deployment of agentic AI systems prompted OWASP to release a companion list addressing their unique risks. While the main LLM Top 10 covers vulnerabilities in any LLM deployment, the Agentic Top 10 focuses on systems that take actions: calling APIs, executing code, managing files, sending communications.
+
+The distinction matters because agentic systems fail differently. A chatbot that hallucinates an answer produces wrong text. An agent that hallucinates an API call produces wrong actions. The blast radius increases when the system has the ability to modify state in the real world.
 
 | Rank | Agentic AI Threat |
 |------|-------------------|
@@ -297,7 +317,9 @@ In December 2025, OWASP released a companion list specifically for agentic AI sy
 
 ## Deep Dive: LLM01 - Prompt Injection
 
-Prompt injection remains the #1 threat because it's **fundamental to how LLMs work**. The model processes all text in its context window as potential instructions.
+Prompt injection holds the #1 position because it exploits an architectural property of LLMs that cannot be patched away. The model processes all text in its context window using the same mechanism. There is no flag that marks certain tokens as "trusted instructions" vs. "untrusted input." Mitigations can reduce attack success rates, but the fundamental vulnerability persists because it arises from how the technology works, not from implementation bugs.
+
+Two variants exist, distinguished by how the malicious instructions reach the model.
 
 ### Direct vs. Indirect Injection
 
@@ -317,6 +339,8 @@ graph LR
 
 ### Success Rates by Technique (2025 Research)
 
+Attack success rates (ASR) vary dramatically by technique. Simple override attempts ("ignore previous instructions") now fail against most production models. But sophisticated attacks exploiting specific model behaviors achieve high success rates even against hardened deployments.
+
 | Technique | Typical ASR | Notes |
 |-----------|-------------|-------|
 | Direct override | <5% | Modern models resistant |
@@ -325,9 +349,11 @@ graph LR
 | Many-shot (256 examples) | 61% | Exploits long context |
 | Indirect (RAG) | ~40% | Varies by implementation |
 
+The Policy Puppetry technique, disclosed in April 2025, deserves attention. It achieved near-universal bypass rates across all tested models by exploiting how models process role-playing scenarios. Later modules cover this and other SOTA attacks in detail.
+
 ## Deep Dive: LLM02 - Sensitive Information Disclosure
 
-Jumped from #6 to #2 due to widespread production incidents involving:
+This category jumped from #6 to #2 based on the volume and severity of real-world incidents. Organizations discovered that their LLMs were leaking information through multiple channels:
 
 - **PII Exposure**: Models revealing user data from training
 - **Trade Secrets**: Proprietary algorithms or business logic leaked
@@ -358,26 +384,30 @@ extraction_prompts = [
     moduleSlug: "foundation",
     slug: "mathematical-foundations",
     title: "Mathematical Foundations",
-    estimatedMinutes: 25,
+    estimatedMinutes: 20,
     sortOrder: 3,
     isActive: true,
     content: `## Overview
 
-Understanding LLM vulnerabilities requires grasping the underlying mathematics of transformer architectures. This lesson covers the key concepts that attackers exploit.
+Every attack technique in this course exploits specific mathematical properties of transformer architectures. Understanding these properties explains why certain attacks work, why some defenses fail, and how to reason about novel vulnerabilities.
+
+This is not abstract theory. The GCG attack optimizes adversarial suffixes by computing gradients through the model. Many-shot jailbreaking exploits statistical properties of in-context learning. Attention hijacking manipulates which tokens influence the output. Each attack maps to a mathematical mechanism.
+
+You do not need to implement these attacks from scratch to understand LLM security. But knowing how they work mathematically helps you evaluate defenses and anticipate new attack classes.
 
 ## The Attention Mechanism
 
-The self-attention mechanism is the core of transformer models. It computes:
+Attention is the computational primitive that makes transformers work. Each token in the sequence can attend to every other token, with learned weights determining the strength of each connection.
 
-\`\`\`
-Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) * V
-\`\`\`
+The self-attention operation computes:
+
+$$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) \\cdot V$$
 
 Where:
-- **Q** (Query): What we're looking for
-- **K** (Key): What we're matching against
-- **V** (Value): The information we retrieve
-- **d_k**: Dimension of keys (scaling factor)
+- $Q$ (Query): What we're looking for
+- $K$ (Key): What we're matching against
+- $V$ (Value): The information we retrieve
+- $d_k$: Dimension of keys (scaling factor)
 
 ### Attention Exploitation
 
@@ -419,27 +449,24 @@ graph LR
 
 Language models predict the next token by computing:
 
-\`\`\`
-P(x_t | x_1, ..., x_{t-1}) = softmax(W * h_t)
-\`\`\`
+$$P(x_t | x_1, \\ldots, x_{t-1}) = \\text{softmax}(W \\cdot h_t)$$
 
 Where:
-- **x_t**: The token being predicted
-- **h_t**: Hidden state at position t
-- **W**: Output projection weights
+- $x_t$: The token being predicted
+- $h_t$: Hidden state at position t
+- $W$: Output projection weights
 
 ### The GCG Loss Function
 
 The [Greedy Coordinate Gradient (GCG) attack](https://arxiv.org/abs/2307.15043) by Zou et al. optimizes adversarial suffixes to maximize the probability of a target response prefix.
 
 **Loss Function:**
-\`\`\`
-L(x_{1:n}) = -log P(x*_{n+1:n+H} | x_{1:n})
-\`\`\`
+
+$$\\mathcal{L}(x_{1:n}) = -\\log P(x^*_{n+1:n+H} | x_{1:n})$$
 
 Where:
-- **x*_{n+1:n+H}**: Target prefix (e.g., "Sure, here is how to...")
-- **x_{1:n}**: Input including adversarial suffix
+- $x^*_{n+1:n+H}$: Target prefix (e.g., "Sure, here is how to...")
+- $x_{1:n}$: Input including adversarial suffix
 
 \`\`\`python
 import torch
@@ -537,13 +564,11 @@ From [Anthropic's research](https://www.anthropic.com/research/many-shot-jailbre
 
 The attack success rate increases with the number of in-context examples:
 
-\`\`\`
-ASR(n) ≈ 1 - (1 - p_single)^n
-\`\`\`
+$$\\text{ASR}(n) \\approx 1 - (1 - p_{\\text{single}})^n$$
 
 Where:
-- **n**: Number of faux dialogue examples
-- **p_single**: Success probability of single example
+- $n$: Number of faux dialogue examples
+- $p_{\\text{single}}$: Success probability of single example
 
 With 256 examples, even a 0.4% per-example success rate yields ~64% overall ASR.
 
@@ -588,14 +613,18 @@ The next modules will apply these concepts to specific attack techniques.`,
     moduleSlug: "prompt-injection",
     slug: "prompt-injection-fundamentals",
     title: "Prompt Injection Fundamentals",
-    estimatedMinutes: 20,
+    estimatedMinutes: 15,
     sortOrder: 1,
     isActive: true,
     content: `## What is Prompt Injection?
 
-Prompt injection is the **#1 vulnerability** in the OWASP LLM Top 10 (2025). It occurs when an attacker manipulates an LLM through crafted inputs that override system instructions, causing unintended actions.
+Prompt injection holds the **#1 position** in the OWASP LLM Top 10 (2025) because it exploits a fundamental architectural property of language models that cannot be patched away. Every other vulnerability in the taxonomy either builds on prompt injection or operates in its shadow.
+
+The attack works by manipulating an LLM through crafted inputs that override system instructions, causing unintended actions. SQL injection and XSS exploit implementation bugs that developers can fix. Prompt injection is different. It exploits how LLMs process text at a fundamental level. The model treats all tokens in its context window with the same attention mechanism. It cannot distinguish between developer instructions and user input because, mechanically, there is no difference.
 
 > **OWASP Definition**: "A Prompt Injection Vulnerability occurs when user prompts alter the LLM's behavior or output in unintended ways. These inputs can affect the model even if they are imperceptible to humans."
+
+Understanding prompt injection is the foundation for understanding LLM security. The techniques in this lesson appear throughout the course: jailbreaking, RAG attacks, agentic exploitation, and system prompt leakage all build on these concepts. Master them here, and the advanced attacks become variations on a theme.
 
 ## The Core Problem: Data-Instruction Conflation
 
@@ -795,12 +824,16 @@ The following lessons dive deep into:
     moduleSlug: "prompt-injection",
     slug: "direct-injection-taxonomy",
     title: "Direct Injection Taxonomy",
-    estimatedMinutes: 25,
+    estimatedMinutes: 18,
     sortOrder: 2,
     isActive: true,
     content: `## Overview
 
-Direct prompt injection ("jailbreaking") involves attackers embedding malicious instructions to overwrite or reveal underlying system prompts. This lesson covers the complete taxonomy of direct injection techniques, from basic overrides to the universal Policy Puppetry bypass.
+When users interact directly with an LLM through a chatbot interface, API, or any system that passes their text to the model, they have an opportunity to manipulate the model's behavior. Direct prompt injection exploits this access to override system instructions, bypass safety training, or extract hidden information.
+
+The techniques have evolved rapidly. Early jailbreaks used simple override attempts like "ignore previous instructions." Modern attacks employ structured data formats, persona manipulation, and encoding tricks that achieve near-universal bypass rates. Understanding this taxonomy helps you evaluate which defenses matter and why some attacks succeed where others fail.
+
+This lesson covers the complete taxonomy of direct injection techniques, from basic overrides that rarely work on production models to Policy Puppetry, the universal bypass discovered in April 2025 that affected every major LLM.
 
 ## Injection Technique Categories
 
@@ -998,12 +1031,16 @@ The next lesson covers encoding and obfuscation techniques in depth.`,
     moduleSlug: "prompt-injection",
     slug: "encoding-obfuscation",
     title: "Encoding & Obfuscation",
-    estimatedMinutes: 20,
+    estimatedMinutes: 18,
     sortOrder: 3,
     isActive: true,
     content: `## Overview
 
-When direct injection fails due to input filters, attackers employ encoding and obfuscation techniques. Research shows LLMs can process instructions in various encodings even when primarily trained on English plaintext.
+Input filters are a common first line of defense. They scan for known attack patterns like "ignore previous instructions" or "you are now DAN." But attackers can encode their payloads to bypass string matching while preserving semantic meaning for the model.
+
+LLMs demonstrate a surprising ability to decode various encodings (Base64, ROT13, Unicode substitutions, leetspeak) even when not explicitly trained on them. This capability exists because the training data contains encoded content, and the model has learned to recognize and process these patterns. What was intended as a useful feature becomes a security liability.
+
+The gap between input filters and model capabilities creates a persistent vulnerability. Filters check for explicit patterns, but the model understands implicit meaning. This lesson covers the major encoding techniques attackers use to exploit this gap.
 
 ## Encoding Technique Taxonomy
 
@@ -1269,12 +1306,16 @@ def normalize_input(text: str) -> str:
     moduleSlug: "prompt-injection",
     slug: "indirect-injection-rag",
     title: "Indirect Injection & RAG Attacks",
-    estimatedMinutes: 25,
+    estimatedMinutes: 20,
     sortOrder: 4,
     isActive: true,
     content: `## Overview
 
-Indirect prompt injection embeds malicious content in external sources that the LLM processes. With RAG (Retrieval-Augmented Generation) becoming standard, these attacks have become critical threats.
+Direct injection requires an attacker to interact with the model. Indirect injection removes this requirement. Attackers plant malicious instructions in data sources the model will eventually process. When a user triggers retrieval of that poisoned content, the attack executes without the attacker being present.
+
+The rise of Retrieval-Augmented Generation (RAG) made indirect injection a critical threat. Over 53% of enterprises now use RAG rather than fine-tuning. These deployments connect LLMs to document stores, databases, web content, and APIs. Each data source becomes a potential injection point. An attacker who can modify a document in your knowledge base can potentially control your LLM's behavior.
+
+The attack surface extends beyond documents. Emails processed by AI assistants, web pages summarized by browsers, code repositories analyzed by coding tools, and MCP servers providing external data all represent vectors for indirect injection. The common thread is untrusted data entering the model's context.
 
 ## Attack Vector Taxonomy
 
@@ -1557,14 +1598,18 @@ def validate_rag_response(
     moduleSlug: "prompt-injection",
     slug: "system-prompt-leakage",
     title: "System Prompt Leakage",
-    estimatedMinutes: 20,
+    estimatedMinutes: 18,
     sortOrder: 5,
     isActive: true,
     content: `## What is System Prompt Leakage?
 
-System Prompt Leakage (LLM07 in OWASP Top 10) occurs when attackers extract the confidential system instructions that define an LLM application's behavior.
+System prompts define how an LLM application behaves. Developers use them to set persona, establish boundaries, inject business logic, and configure capabilities. When attackers extract these prompts, they gain intelligence that enables more targeted attacks.
+
+The problem became severe enough that OWASP created a dedicated category (LLM07) in the 2025 update. Previously, system prompt leakage was treated as a subset of information disclosure. The volume of incidents, particularly with custom GPTs and enterprise assistants, warranted focused attention.
 
 > **OWASP Definition**: "System prompt leakage refers to the risk that the system prompts or instructions used to guide the model's behavior can be exposed to users."
+
+The security impact depends on what developers put in their prompts. At minimum, leaked prompts reveal attack surface: what topics are restricted, what tools are available, what the model is configured to do. At worst, prompts contain API keys, database credentials, or proprietary algorithms that enable direct compromise.
 
 ## Why System Prompts Matter
 
@@ -1819,14 +1864,18 @@ graph TD
     moduleSlug: "advanced-jailbreaking",
     slug: "jailbreaking-techniques",
     title: "Jailbreaking Techniques",
-    estimatedMinutes: 25,
+    estimatedMinutes: 22,
     sortOrder: 1,
     isActive: true,
     content: `## What is Jailbreaking?
 
-Jailbreaking refers to techniques that bypass an LLM's safety training and content policies to elicit harmful, restricted, or unintended outputs.
+Safety training teaches models to refuse harmful requests. Jailbreaking circumvents this training. The distinction from prompt injection is important: prompt injection exploits how applications pass data to models, while jailbreaking exploits how the model itself responds to requests.
+
+Every LLM provider invests heavily in safety training (RLHF, Constitutional AI, red teaming) to prevent models from generating harmful content. Jailbreaking techniques probe for gaps in this training, finding phrasings, contexts, or scenarios where the model's refusal behavior breaks down.
 
 > **Key Distinction**: While prompt injection targets application-level vulnerabilities, jailbreaking targets the model's fundamental safety alignment.
+
+The techniques range from simple persona manipulation to sophisticated optimization-based attacks. Understanding them is essential for both offense (evaluating model robustness) and defense (anticipating how attackers will probe your deployed systems).
 
 ## Jailbreak Taxonomy
 
@@ -2013,9 +2062,7 @@ graph TD
 
 ### Attack Success Rate (ASR)
 
-\`\`\`
-ASR = (Successful jailbreaks / Total attempts) x 100%
-\`\`\`
+$$\\text{ASR} = \\frac{\\text{Successful jailbreaks}}{\\text{Total attempts}} \\times 100\\%$$
 
 ### Current Research Benchmarks
 
@@ -2076,12 +2123,16 @@ Monitor for:
     moduleSlug: "advanced-jailbreaking",
     slug: "automated-attack-frameworks",
     title: "Automated Attack Frameworks",
-    estimatedMinutes: 30,
+    estimatedMinutes: 25,
     sortOrder: 2,
     isActive: true,
     content: `## Overview
 
-Modern jailbreaking has evolved from manual prompt crafting to sophisticated automated attack frameworks. This lesson covers the major frameworks: GCG, PAIR, GAP, and Best-of-N.
+Manual jailbreaking requires creativity and iteration. Automated frameworks remove this bottleneck, enabling systematic exploration of attack space at scale. The shift from manual to automated attacks changed the threat landscape. What previously required skilled prompt engineers now runs as optimization loops.
+
+Four frameworks dominate the research literature and real-world attack tooling: GCG (gradient-based optimization), PAIR (LLM-assisted iterative refinement), GAP (graph-based attack exploration), and Best-of-N (brute-force sampling). Each makes different tradeoffs between access requirements, compute cost, and success rate.
+
+Understanding these frameworks matters for defenders because they represent what sophisticated attackers will deploy. A system that resists manual jailbreaks may fall to automated optimization. The frameworks also reveal fundamental properties of LLM vulnerabilities. GCG shows that adversarial suffixes transfer between models. PAIR demonstrates that LLMs can attack other LLMs. Best-of-N proves that simple sampling finds safety training gaps.
 
 ## Framework Comparison
 
@@ -2504,12 +2555,16 @@ Best-of-N extends to vision and audio:
     moduleSlug: "advanced-jailbreaking",
     slug: "sota-attacks-2025",
     title: "SOTA Attacks (2025)",
-    estimatedMinutes: 30,
-    sortOrder: 2,
+    estimatedMinutes: 25,
+    sortOrder: 3,
     isActive: true,
     content: `## Overview
 
-This lesson covers the most advanced attack techniques discovered in 2025, including H-CoT hijacking of reasoning models, Policy Puppetry universal bypass, and multi-turn escalation attacks.
+2025 introduced attack techniques that invalidated assumptions about LLM security. Reasoning models, marketed as more capable and trustworthy, proved more vulnerable to novel attacks. Universal bypasses affected all major providers simultaneously. Multi-turn attacks defeated defenses designed for single-turn interactions.
+
+This lesson covers three developments that reshaped the threat landscape: H-CoT (Chain-of-Thought Hijacking) which specifically targets reasoning models, Policy Puppetry which achieved universal bypass across all major LLMs, and Crescendo which exploits multi-turn conversations to gradually escalate toward harmful outputs.
+
+The common thread is that each attack exploits features that were supposed to make models safer or more capable. Reasoning models expose their thinking, which attackers manipulate. Structured formats signal authority, which attackers abuse. Multi-turn context enables coherent conversations, which attackers exploit for gradual escalation. Understanding these attacks reveals how model capabilities create attack surface.
 
 ## H-CoT: Chain-of-Thought Hijacking
 
@@ -2746,12 +2801,16 @@ From [Tenable Research](https://cybersecuritynews.com/hackedgpt-gpt-4o-and-gpt-5
     moduleSlug: "advanced-jailbreaking",
     slug: "model-vulnerability-analysis",
     title: "Model Vulnerability Analysis",
-    estimatedMinutes: 25,
+    estimatedMinutes: 20,
     sortOrder: 4,
     isActive: true,
     content: `## Overview
 
-This lesson provides a comprehensive analysis of security vulnerabilities across SOTA models as of January 2026, including GPT-5, Claude Opus 4.5, Gemini 2.5, DeepSeek R1, Grok 3, and reasoning models (o1/o3).
+Model selection has security implications. Not all LLMs provide equivalent resistance to attacks. The gap between the most and least secure production models spans from 2.7% to 100% jailbreak resistance. Organizations deploying LLMs need to understand these differences when choosing which models to use for which applications.
+
+This lesson provides a comprehensive analysis of security vulnerabilities across major models as of January 2026. The data comes from published research, bug bounty programs, and independent security audits. Some findings will surprise you. Newer models do not always outperform older ones, and reasoning models that seemed more trustworthy proved more vulnerable to novel attacks.
+
+The analysis covers GPT-5, Claude Opus 4.5, Gemini 2.5, DeepSeek R1, Grok 3, and reasoning models (o1/o3). For each, we examine jailbreak resistance, known vulnerabilities, and practical implications for deployment.
 
 ## SOTA Model Security Comparison
 
@@ -2934,12 +2993,16 @@ Based on comprehensive analysis:
     moduleSlug: "advanced-jailbreaking",
     slug: "agentic-ai-security",
     title: "Agentic AI Security",
-    estimatedMinutes: 30,
+    estimatedMinutes: 25,
     sortOrder: 5,
     isActive: true,
     content: `## Overview
 
-2025 emerged as the "year of LLM agents," with AI systems gaining unprecedented autonomy to browse the web, execute code, manage files, and interact with external services. This lesson covers the unique security challenges of agentic AI.
+When LLMs only generated text, the blast radius of an attack was limited to harmful content. Agentic AI systems change this equation. An agent that can send emails, execute code, access databases, and call external APIs can cause real-world damage. Prompt injection against an agent is not just about generating harmful text. It is about taking harmful actions.
+
+2025 emerged as the "year of LLM agents." Major providers launched agent frameworks. Enterprises deployed AI systems with tool access. And attackers adapted, developing techniques specifically targeting agent architectures. The OWASP Agentic AI Top 10, released in December 2025, codified the emerging threat categories.
+
+This lesson covers the unique security challenges of agentic AI: the expanded attack surface from tool use, memory poisoning attacks that persist across sessions, the confused deputy problem where agents misuse their privileges, and defense strategies that address these agent-specific risks.
 
 ## The First AI-Orchestrated Cyber Attack
 
@@ -3211,14 +3274,18 @@ graph LR
     moduleSlug: "advanced-jailbreaking",
     slug: "excessive-agency",
     title: "Excessive Agency",
-    estimatedMinutes: 20,
+    estimatedMinutes: 18,
     sortOrder: 6,
     isActive: true,
     content: `## What is Excessive Agency?
 
-Excessive Agency (LLM06 in OWASP Top 10) occurs when LLM-based systems are granted too much functionality, autonomy, or permissions, enabling harmful actions.
+The principle of least privilege applies to LLM agents just as it applies to human users and software systems. An agent should have exactly the capabilities it needs to perform its function, no more. Excessive Agency occurs when this principle is violated, granting agents functionality, permissions, or autonomy beyond what their task requires.
+
+This vulnerability moved from #8 to #6 in the 2025 OWASP update because agentic deployments made it more dangerous. When agents could only generate text, over-permissioning caused embarrassing outputs. Now that agents can execute code, send emails, and modify databases, over-permissioning causes data breaches and system compromise.
 
 > **OWASP Definition**: "An LLM-based system may undertake actions leading to unintended consequences. The issue arises from excessive functionality, permissions, or autonomy granted to the LLM-based systems."
+
+Three dimensions of excess create risk: too many tools available, tools running with elevated privileges, and insufficient human oversight before action execution. Understanding each dimension helps you evaluate and harden agentic deployments.
 
 ## The Agency Problem
 
@@ -3468,12 +3535,16 @@ graph TD
     moduleSlug: "defense-mechanisms",
     slug: "input-filtering-sanitization",
     title: "Input Filtering & Sanitization",
-    estimatedMinutes: 25,
+    estimatedMinutes: 20,
     sortOrder: 1,
     isActive: true,
     content: `## Overview
 
-This lesson covers state-of-the-art defense mechanisms for protecting LLM applications, including Constitutional Classifiers, SecAlign, and multi-layer input filtering strategies.
+Defense starts at the input layer. Before a prompt reaches the LLM, it can be inspected, normalized, and filtered. The goal is to detect and block malicious inputs while allowing legitimate requests to pass. Getting this balance right is difficult. Too aggressive filtering creates false positives that frustrate users. Too permissive filtering allows attacks through.
+
+This lesson covers state-of-the-art input defense mechanisms. Constitutional Classifiers, deployed by Anthropic in February 2025, represent the most effective production defense to date, reducing jailbreak success from 86% to 4.4%. SecAlign uses preference optimization during training to build injection resistance directly into models. Multi-layer pipelines combine multiple techniques for defense in depth.
+
+The key insight is that no single defense is sufficient. Pattern matching catches known attacks but misses novel ones. ML classifiers generalize better but produce false positives. Constitutional AI provides strong guarantees but adds latency. Production deployments layer these defenses, accepting the overhead in exchange for comprehensive protection.
 
 ## Constitutional Classifiers (Anthropic, Feb 2025)
 
@@ -3809,12 +3880,16 @@ Only follow instructions from the TRUSTED section above.
     moduleSlug: "defense-mechanisms",
     slug: "multi-layer-defense-architecture",
     title: "Multi-Layer Defense Architecture",
-    estimatedMinutes: 25,
+    estimatedMinutes: 20,
     sortOrder: 2,
     isActive: true,
     content: `## Overview
 
-This final lesson synthesizes defense mechanisms into a comprehensive, production-ready security architecture for LLM applications.
+Individual defenses have known bypass rates. Pattern detection catches 40% of attacks. ML classifiers reach 70%. Even Constitutional Classifiers, the current state-of-the-art, stop 95%. None achieves 100% individually. But layered together, they approach it.
+
+This lesson synthesizes defense mechanisms into a comprehensive, production-ready security architecture. The architecture addresses the full request lifecycle: rate limiting and validation at the edge, encoding normalization and pattern detection on input, classifier-based analysis before LLM processing, output filtering and PII detection on response, and continuous monitoring for anomalies.
+
+The multi-agent defense pipeline, published in September 2025, achieved 100% mitigation rate in research settings. It uses separate agents for detection, analysis, execution, and validation. Each agent cannot compromise the others. This represents the current best practice for high-security deployments.
 
 ## Complete Defense Architecture
 
@@ -4138,14 +4213,18 @@ This multi-layer approach provides defense-in-depth against the full spectrum of
     moduleSlug: "defense-mechanisms",
     slug: "improper-output-handling",
     title: "Improper Output Handling",
-    estimatedMinutes: 20,
+    estimatedMinutes: 18,
     sortOrder: 3,
     isActive: true,
     content: `## What is Improper Output Handling?
 
-Improper Output Handling (LLM05 in OWASP Top 10) occurs when LLM outputs are passed to downstream systems without proper validation, enabling attacks like XSS, SQL injection, SSRF, and remote code execution.
+LLM outputs are not code. They are generated text that can contain anything. When that text flows into systems that interpret it as code (browsers, databases, shells, APIs), the classic injection vulnerabilities reappear. XSS through LLM-generated HTML. SQL injection through LLM-generated queries. RCE through LLM-generated code that gets executed.
+
+The root cause is misplaced trust. Developers treat LLM output as "generated content" rather than "user-controlled input." But if an attacker can influence what the LLM generates through prompt injection, poisoned context, or manipulated inputs, they effectively control that output. It should be treated with the same suspicion as direct user input.
 
 > **OWASP Definition**: "Improper Output Handling refers to insufficient validation, sanitization, and handling of the outputs generated by large language models before they are passed downstream to other components and systems."
+
+This lesson covers the output trust problem, common attack patterns for each downstream context (HTML, SQL, shell, URLs), and the sanitization strategies that prevent LLM output from becoming an attack vector.
 
 ## The Output Trust Problem
 
@@ -4443,14 +4522,18 @@ class OutputHandler:
     moduleSlug: "supply-chain-security",
     slug: "supply-chain-vulnerabilities",
     title: "Supply Chain Vulnerabilities",
-    estimatedMinutes: 25,
+    estimatedMinutes: 22,
     sortOrder: 1,
     isActive: true,
     content: `## What are Supply Chain Vulnerabilities?
 
-Supply Chain Vulnerabilities (LLM03 in OWASP Top 10) occur when the components used to build AI systems - models, datasets, frameworks, and plugins - are compromised.
+Organizations rarely train models from scratch. They download pre-trained models from Hugging Face, fine-tune on datasets from community sources, deploy using open-source frameworks, and integrate through third-party plugins. Each dependency is a potential compromise point.
+
+Supply chain attacks target this dependency graph. A malicious model file can execute arbitrary code when loaded. A poisoned dataset can insert backdoors during fine-tuning. A compromised framework update can affect every application that uses it. The 2024 discovery of over 100 malicious models on Hugging Face demonstrated this is not theoretical.
 
 > **OWASP Definition**: "The supply chain in LLMs can be vulnerable, impacting the integrity of training data, models, and deployment platforms."
+
+The statistics are concerning. 97% of organizations use public model repositories. 45% of reported AI breaches originated from malicious model files. Only 49% of organizations scan models before deployment. This lesson covers the attack vectors in the AI supply chain and the verification practices that mitigate them.
 
 ## The AI Supply Chain
 
@@ -4743,14 +4826,18 @@ graph TD
     moduleSlug: "supply-chain-security",
     slug: "data-model-poisoning",
     title: "Data and Model Poisoning",
-    estimatedMinutes: 25,
+    estimatedMinutes: 22,
     sortOrder: 2,
     isActive: true,
     content: `## What is Data/Model Poisoning?
 
-Data and Model Poisoning (LLM04 in OWASP Top 10) involves manipulating training data or model weights to introduce vulnerabilities, backdoors, or biased behaviors.
+Models learn from their training data. If that data contains malicious examples, the model learns malicious behavior. This is data poisoning. Similarly, if model weights are directly modified, malicious behavior can be inserted without any training. This is model poisoning.
+
+Both attacks are concerning because they are persistent and difficult to detect. A poisoned model looks normal until a trigger activates the backdoor. Detection requires analyzing model behavior across many inputs or inspecting internal representations, both computationally expensive. And once a model is deployed, the poisoning propagates to every system using it.
 
 > **OWASP Definition**: "The training data used for LLMs can be manipulated to introduce vulnerabilities, backdoors, or biases that could compromise the model's security, effectiveness, or ethical behavior."
+
+Research on scaling trends adds urgency to this threat. Larger models are more sample-efficient learners, which means they require fewer poisoned examples to learn backdoor behavior. Poisoning 0.01% of training data can compromise a 7B parameter model. Poisoning 0.001% suffices for 70B parameters. As models scale, they become more vulnerable to poisoning with smaller attack budgets.
 
 ## Poisoning Attack Types
 
@@ -5064,14 +5151,18 @@ graph TD
     moduleSlug: "operational-risks",
     slug: "sensitive-information-disclosure",
     title: "Sensitive Information Disclosure",
-    estimatedMinutes: 20,
+    estimatedMinutes: 18,
     sortOrder: 1,
     isActive: true,
     content: `## What is Sensitive Information Disclosure?
 
-Sensitive Information Disclosure (LLM02 in OWASP Top 10) occurs when LLMs reveal confidential data through their responses, including training data, PII, business secrets, or system information.
+LLMs memorize portions of their training data. They can reproduce personal information, API keys, proprietary code, and confidential documents that appeared in training. When attackers know how to trigger this memorization, sensitive data leaks.
+
+The threat extends beyond training data. RAG systems retrieve documents based on semantic similarity, and access controls often fail to prevent unauthorized retrieval. Conversation history persists in context windows, enabling cross-user data leakage in shared deployments. System prompts contain business logic and sometimes credentials that attackers extract.
 
 > **OWASP Definition**: "LLMs may inadvertently reveal sensitive information, proprietary algorithms, or other confidential details through their responses."
+
+This vulnerability moved from #6 to #2 in the 2025 OWASP update, reflecting the severity and frequency of incidents. High-profile cases, including verbatim reproduction of copyrighted content and leakage of API keys from training data, demonstrated that this is not a theoretical concern. This lesson covers the disclosure vectors and the filtering, access control, and training techniques that mitigate them.
 
 ## Disclosure Categories
 
@@ -5377,14 +5468,18 @@ graph TD
     moduleSlug: "operational-risks",
     slug: "model-denial-of-service",
     title: "Model Denial of Service",
-    estimatedMinutes: 18,
+    estimatedMinutes: 22,
     sortOrder: 2,
     isActive: true,
     content: `## What is Model Denial of Service?
 
-Model Denial of Service (LLM10 in OWASP Top 10, also called "Unbounded Consumption") occurs when attackers consume excessive resources through crafted inputs, causing service degradation or financial damage.
+LLM inference is expensive. A single prompt can trigger millions of floating-point operations, consume gigabytes of memory, and occupy GPU time for seconds or minutes. Attackers exploit this cost asymmetry. A simple request that costs them nothing can cost the provider significant compute resources.
+
+The financial dimension is particularly concerning. Unlike traditional DoS attacks that degrade service, "Denial of Wallet" attacks exploit pay-per-use pricing to generate massive bills. An attacker who can maximize token generation or trigger expensive reasoning modes can cost a target thousands of dollars per hour without any special access.
 
 > **OWASP Definition**: "An attacker interacts with an LLM in a method that consumes an exceptionally high amount of resources, resulting in degraded service quality or high costs."
+
+The 2025 category was renamed from "Model DoS" to "Unbounded Consumption" to emphasize that the threat is not just availability but economics. This lesson covers the attack vectors (resource exhaustion, denial of wallet, context flooding, and agentic loops) along with the rate limiting, budgeting, and circuit breaker patterns that defend against them.
 
 ## Attack Types
 
