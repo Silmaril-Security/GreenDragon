@@ -9,7 +9,7 @@ import { isTestEnvironment } from "../constants";
  */
 export function getLanguageModel(modelId: string): LanguageModel {
   if (isTestEnvironment) {
-    const { getMockModel } = require("./models.test");
+    const { getMockModel } = require("./models.mock");
     return getMockModel(modelId);
   }
   return gateway.languageModel(modelId);
