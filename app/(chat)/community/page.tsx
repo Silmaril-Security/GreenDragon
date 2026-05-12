@@ -22,10 +22,10 @@ export default function CommunityPage() {
             <h3 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">
               Join the Conversation
             </h3>
-            <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.03] via-transparent to-transparent p-6 sm:p-8 transition-all duration-500 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/5">
+            <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.03] via-transparent to-transparent p-6 transition-all duration-500 hover:border-emerald-500/40 hover:shadow-emerald-500/5 hover:shadow-lg sm:p-8">
               {/* Ambient glow */}
-              <div className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-emerald-500/10 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-32 -left-32 size-64 rounded-full bg-emerald-600/5 blur-3xl" />
+              <div className="-right-20 -top-20 pointer-events-none absolute size-64 rounded-full bg-emerald-500/10 blur-3xl" />
+              <div className="-bottom-32 -left-32 pointer-events-none absolute size-64 rounded-full bg-emerald-600/5 blur-3xl" />
 
               <p className="relative mb-6 text-muted-foreground">
                 Whether you&apos;re just curious about AI security or already

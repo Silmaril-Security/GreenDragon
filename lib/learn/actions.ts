@@ -1,33 +1,50 @@
 "use server";
 
 import {
+  getAdjacentLessons as getAdjacentLessonsQuery,
+  getCourseBySlug as getCourseBySlugQuery,
+  getFeaturedCourse as getFeaturedCourseQuery,
   getLearnCourses,
-  getFeaturedCourse,
-  getCourseBySlug,
-  getModulesByCourse,
-  getModuleBySlug,
-  getLessonsByModule,
   getLessonBySlug as getLessonBySlugQuery,
-  getAdjacentLessons,
+  getLessonsByModule as getLessonsByModuleQuery,
+  getModuleBySlug,
+  getModulesByCourse as getModulesByCourseQuery,
 } from "@/lib/db/queries";
 
-export {
-  getLearnCourses as getCourses,
-  getFeaturedCourse,
-  getCourseBySlug,
-  getModulesByCourse,
-  getLessonsByModule,
-  getAdjacentLessons,
-};
+export async function getCourses() {
+  return await getLearnCourses();
+}
+
+export async function getFeaturedCourse() {
+  return await getFeaturedCourseQuery();
+}
+
+export async function getCourseBySlug(slug: string) {
+  return await getCourseBySlugQuery(slug);
+}
+
+export async function getModulesByCourse(courseId: string) {
+  return await getModulesByCourseQuery(courseId);
+}
+
+export async function getLessonsByModule(moduleId: string) {
+  return await getLessonsByModuleQuery(moduleId);
+}
+
+export async function getAdjacentLessons(moduleId: string, sortOrder: number) {
+  return await getAdjacentLessonsQuery(moduleId, sortOrder);
+}
 
 export async function getCourseWithModulesAndLessons(slug: string) {
-  const courseData = await getCourseBySlug(slug);
-  if (!courseData) return null;
+  const courseData = await getCourseBySlugQuery(slug);
+  if (!courseData) {
+    return null;
+  }
 
-  const modules = await getModulesByCourse(courseData.id);
+  const modules = await getModulesByCourseQuery(courseData.id);
   const modulesWithLessons = await Promise.all(
     modules.map(async (mod) => {
-      const lessons = await getLessonsByModule(mod.id);
+      const lessons = await getLessonsByModuleQuery(mod.id);
       return { ...mod, lessons };
     })
   );
@@ -40,14 +57,20 @@ export async function getLessonBySlug(
   moduleSlug: string,
   lessonSlug: string
 ) {
-  const courseData = await getCourseBySlug(courseSlug);
-  if (!courseData) return null;
+  const courseData = await getCourseBySlugQuery(courseSlug);
+  if (!courseData) {
+    return null;
+  }
 
   const moduleData = await getModuleBySlug(courseData.id, moduleSlug);
-  if (!moduleData) return null;
+  if (!moduleData) {
+    return null;
+  }
 
   const lessonData = await getLessonBySlugQuery(moduleData.id, lessonSlug);
-  if (!lessonData) return null;
+  if (!lessonData) {
+    return null;
+  }
 
   return {
     course: courseData,
@@ -57,20 +80,20 @@ export async function getLessonBySlug(
 }
 
 export async function getTotalLessonsInCourse(courseId: string) {
-  const modules = await getModulesByCourse(courseId);
+  const modules = await getModulesByCourseQuery(courseId);
   let total = 0;
   for (const mod of modules) {
-    const lessons = await getLessonsByModule(mod.id);
+    const lessons = await getLessonsByModuleQuery(mod.id);
     total += lessons.length;
   }
   return total;
 }
 
 export async function getTotalMinutesInCourse(courseId: string) {
-  const modules = await getModulesByCourse(courseId);
+  const modules = await getModulesByCourseQuery(courseId);
   let total = 0;
   for (const mod of modules) {
-    const lessons = await getLessonsByModule(mod.id);
+    const lessons = await getLessonsByModuleQuery(mod.id);
     total += lessons.reduce((sum, l) => sum + (l.estimatedMinutes || 0), 0);
   }
   return total;

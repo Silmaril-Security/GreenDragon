@@ -27,6 +27,26 @@ export type WebPreviewContextValue = {
 
 const WebPreviewContext = createContext<WebPreviewContextValue | null>(null);
 
+const safePreviewSrc = (value: string | undefined) => {
+  const candidate = value?.trim();
+  if (!candidate) {
+    return;
+  }
+
+  if (candidate === "about:blank") {
+    return candidate;
+  }
+
+  try {
+    const url = new URL(candidate);
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? url.href
+      : undefined;
+  } catch {
+    return;
+  }
+};
+
 const useWebPreview = () => {
   const context = useContext(WebPreviewContext);
   if (!context) {
@@ -171,7 +191,7 @@ export const WebPreviewBody = ({
       <iframe
         className={cn("size-full", className)}
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"
-        src={(src ?? url) || undefined}
+        src={safePreviewSrc(src ?? url)}
         title="Preview"
         {...props}
       />

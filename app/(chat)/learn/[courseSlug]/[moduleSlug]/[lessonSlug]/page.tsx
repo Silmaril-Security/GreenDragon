@@ -1,13 +1,13 @@
+import { BookOpen, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
-import { Clock, BookOpen } from "lucide-react";
-import { PageHeader } from "@/components/page-header";
 import { Breadcrumbs } from "@/components/learn/breadcrumbs";
 import { DifficultyBadge } from "@/components/learn/difficulty-badge";
 import { LessonContent } from "@/components/learn/lesson-content";
 import { LessonNavigation } from "@/components/learn/lesson-navigation";
+import { PageHeader } from "@/components/page-header";
 import {
-  getLessonBySlug,
   getAdjacentLessons,
+  getLessonBySlug,
   getLessonsByModule,
 } from "@/lib/learn/actions";
 
@@ -49,13 +49,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
       <PageHeader />
       <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">
         {/* Breadcrumbs */}
-        <Breadcrumbs items={breadcrumbItems} className="mb-6" />
+        <Breadcrumbs className="mb-6" items={breadcrumbItems} />
 
         {/* Lesson Header */}
         <div className="mb-6">
           <h1 className="font-bold text-2xl md:text-3xl">{lesson.title}</h1>
 
-          <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-muted-foreground">
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-muted-foreground text-sm">
             {lesson.estimatedMinutes && (
               <span className="flex items-center gap-1">
                 <Clock className="size-4" />
@@ -83,10 +83,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
         {/* Lesson Navigation */}
         <LessonNavigation
-          prev={adjacentLessons.prev}
-          next={adjacentLessons.next}
           courseSlug={courseSlug}
           moduleSlug={moduleSlug}
+          next={adjacentLessons.next}
+          prev={adjacentLessons.prev}
         />
       </div>
     </div>

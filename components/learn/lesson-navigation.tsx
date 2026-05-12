@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import type { Lesson } from "@/lib/db/schema";
 
 type LessonNavigationProps = {
@@ -16,16 +16,16 @@ export function LessonNavigation({
   moduleSlug,
 }: LessonNavigationProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {prev ? (
         <Link
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-accent/50 sm:max-w-[48%]"
           href={`/learn/${courseSlug}/${moduleSlug}/${prev.slug}`}
-          className="flex items-center gap-2 rounded-lg border bg-card px-4 py-3 hover:bg-accent/50 transition-colors min-w-0 flex-1 sm:max-w-[48%]"
         >
           <ChevronLeft className="size-4 shrink-0" />
-          <div className="text-left min-w-0">
-            <span className="text-xs text-muted-foreground">Previous</span>
-            <p className="font-medium text-sm truncate">{prev.title}</p>
+          <div className="min-w-0 text-left">
+            <span className="text-muted-foreground text-xs">Previous</span>
+            <p className="truncate font-medium text-sm">{prev.title}</p>
           </div>
         </Link>
       ) : (
@@ -34,12 +34,12 @@ export function LessonNavigation({
 
       {next ? (
         <Link
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border bg-card px-4 py-3 transition-colors hover:bg-accent/50 sm:ml-auto sm:max-w-[48%]"
           href={`/learn/${courseSlug}/${moduleSlug}/${next.slug}`}
-          className="flex items-center gap-2 rounded-lg border bg-card px-4 py-3 hover:bg-accent/50 transition-colors min-w-0 flex-1 sm:max-w-[48%] sm:ml-auto"
         >
-          <div className="text-right min-w-0 flex-1">
-            <span className="text-xs text-muted-foreground">Next</span>
-            <p className="font-medium text-sm truncate">{next.title}</p>
+          <div className="min-w-0 flex-1 text-right">
+            <span className="text-muted-foreground text-xs">Next</span>
+            <p className="truncate font-medium text-sm">{next.title}</p>
           </div>
           <ChevronRight className="size-4 shrink-0" />
         </Link>

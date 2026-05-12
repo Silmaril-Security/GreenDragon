@@ -6048,7 +6048,7 @@ async function seed() {
   const moduleCount = await sql`SELECT COUNT(*) as count FROM "Module"`;
   const lessonCount = await sql`SELECT COUNT(*) as count FROM "Lesson"`;
 
-  console.log(`\nSummary:`);
+  console.log("\nSummary:");
   console.log(`  ${courseCount[0].count} courses`);
   console.log(`  ${moduleCount[0].count} modules`);
   console.log(`  ${lessonCount[0].count} lessons`);

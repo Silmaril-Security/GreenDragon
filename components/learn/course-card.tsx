@@ -1,15 +1,15 @@
-import Link from "next/link";
 import {
+  BookOpen,
+  Bug,
+  Clock,
+  Layers,
+  Lock,
   Shield,
   Syringe,
-  Bug,
-  Lock,
-  BookOpen,
   Target,
   Zap,
-  Layers,
-  Clock,
 } from "lucide-react";
+import Link from "next/link";
 import type { Course } from "@/lib/db/schema";
 import { DifficultyBadge } from "./difficulty-badge";
 
@@ -40,17 +40,17 @@ export function CourseCard({
 
   return (
     <Link
-      href={`/learn/${course.slug}`}
       className="group rounded-lg border bg-card p-6 transition-colors hover:border-emerald-500/50"
+      href={`/learn/${course.slug}`}
     >
       <div className="flex items-start gap-4">
         <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted">
           <IconComponent className="size-6 text-muted-foreground" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold truncate">{course.title}</h3>
+          <h3 className="truncate font-semibold">{course.title}</h3>
           {course.subtitle && (
-            <p className="text-sm text-muted-foreground truncate">
+            <p className="truncate text-muted-foreground text-sm">
               {course.subtitle}
             </p>
           )}
@@ -63,7 +63,7 @@ export function CourseCard({
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+      <div className="mt-4 flex items-center gap-4 text-muted-foreground text-sm">
         <span className="flex items-center gap-1">
           <Layers className="size-4" />
           {moduleCount} modules
@@ -71,6 +71,10 @@ export function CourseCard({
         <span className="flex items-center gap-1">
           <BookOpen className="size-4" />
           {lessonCount} lessons
+        </span>
+        <span className="flex items-center gap-1">
+          <Clock className="size-4" />
+          {totalMinutes} min
         </span>
       </div>
 
@@ -80,8 +84,8 @@ export function CourseCard({
           <div className="flex flex-wrap gap-2">
             {course.tags.map((tag) => (
               <span
+                className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground text-xs"
                 key={tag}
-                className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
               >
                 {tag}
               </span>
