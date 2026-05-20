@@ -25,15 +25,15 @@ import {
   type ChallengeProgress,
   type Chat,
   type Course,
-  type Lesson,
-  type Module,
   challenge,
   challengeProgress,
   chat,
   course,
   type DBMessage,
   document,
+  type Lesson,
   lesson,
+  type Module,
   message,
   module,
   type Suggestion,
@@ -49,12 +49,26 @@ import { generateHashedPassword } from "./utils";
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
 
-const connectionString = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("Database connection string not found");
+type Database = ReturnType<typeof drizzle>;
+
+let dbInstance: Database | null = null;
+
+function getDb() {
+  const connectionString = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("Database connection string not found");
+  }
+
+  dbInstance ??= drizzle(postgres(connectionString));
+  return dbInstance;
 }
-const client = postgres(connectionString);
-const db = drizzle(client);
+
+const db = new Proxy({} as Database, {
+  get(_target, prop, receiver) {
+    const value = Reflect.get(getDb(), prop, receiver);
+    return typeof value === "function" ? value.bind(getDb()) : value;
+  },
+});
 
 export async function getUser(email: string): Promise<User[]> {
   try {

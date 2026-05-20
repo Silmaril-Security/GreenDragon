@@ -7,7 +7,7 @@ export default function LessonLoading() {
       <PageHeader />
       <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">
         {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="mb-6 flex items-center gap-2">
           <Skeleton className="h-5 w-12" />
           <Skeleton className="h-5 w-4" />
           <Skeleton className="h-5 w-32" />
@@ -18,7 +18,7 @@ export default function LessonLoading() {
         {/* Lesson Header */}
         <div className="mb-6">
           <Skeleton className="h-9 w-96" />
-          <div className="flex flex-wrap items-center gap-3 mt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <Skeleton className="h-5 w-24" />
             <Skeleton className="h-6 w-16 rounded-full" />
             <Skeleton className="h-5 w-32" />

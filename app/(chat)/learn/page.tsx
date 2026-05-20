@@ -1,26 +1,26 @@
-import { PageHeader } from "@/components/page-header";
+import { connection } from "next/server";
 import { CourseCard } from "@/components/learn/course-card";
 import { FeaturedCourse } from "@/components/learn/featured-course";
 import { ModuleCard } from "@/components/learn/module-card";
+import { PageHeader } from "@/components/page-header";
 import {
   getCourses,
   getFeaturedCourse,
-  getModulesByCourse,
   getLessonsByModule,
+  getModulesByCourse,
   getTotalLessonsInCourse,
   getTotalMinutesInCourse,
 } from "@/lib/learn/actions";
 
 export default async function LearnPage() {
+  await connection();
   const [courses, featuredCourse] = await Promise.all([
     getCourses(),
     getFeaturedCourse(),
   ]);
 
   // Get stats for each course (excluding featured course)
-  const nonFeaturedCourses = courses.filter(
-    (c) => c.id !== featuredCourse?.id
-  );
+  const nonFeaturedCourses = courses.filter((c) => c.id !== featuredCourse?.id);
   const coursesWithStats = await Promise.all(
     nonFeaturedCourses.map(async (course) => {
       const modules = await getModulesByCourse(course.id);
@@ -36,7 +36,11 @@ export default async function LearnPage() {
   );
 
   // Get featured course stats and modules if exists
-  let featuredStats = null;
+  let featuredStats: {
+    lessonCount: number;
+    moduleCount: number;
+    totalMinutes: number;
+  } | null = null;
   let featuredModulesWithStats: Array<{
     module: Awaited<ReturnType<typeof getModulesByCourse>>[number];
     lessonCount: number;
@@ -91,8 +95,8 @@ export default async function LearnPage() {
               </h3>
               <FeaturedCourse
                 course={featuredCourse}
-                moduleCount={featuredStats.moduleCount}
                 lessonCount={featuredStats.lessonCount}
+                moduleCount={featuredStats.moduleCount}
                 totalMinutes={featuredStats.totalMinutes}
               />
             </div>
@@ -108,12 +112,12 @@ export default async function LearnPage() {
                 {featuredModulesWithStats.map(
                   ({ module, lessonCount, totalMinutes }, index) => (
                     <ModuleCard
-                      key={module.id}
-                      module={module}
                       courseSlug={featuredCourse.slug}
+                      key={module.id}
                       lessonCount={lessonCount}
-                      totalMinutes={totalMinutes}
+                      module={module}
                       moduleNumber={index + 1}
+                      totalMinutes={totalMinutes}
                     />
                   )
                 )}
@@ -131,10 +135,10 @@ export default async function LearnPage() {
                 {coursesWithStats.map(
                   ({ course, moduleCount, lessonCount, totalMinutes }) => (
                     <CourseCard
-                      key={course.id}
                       course={course}
-                      moduleCount={moduleCount}
+                      key={course.id}
                       lessonCount={lessonCount}
+                      moduleCount={moduleCount}
                       totalMinutes={totalMinutes}
                     />
                   )

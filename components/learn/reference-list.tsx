@@ -11,7 +11,9 @@ type ReferenceListProps = {
 };
 
 export function ReferenceList({ references }: ReferenceListProps) {
-  if (references.length === 0) return null;
+  if (references.length === 0) {
+    return null;
+  }
 
   return (
     <div>
@@ -21,10 +23,10 @@ export function ReferenceList({ references }: ReferenceListProps) {
       <div className="rounded-lg border bg-card p-4">
         <ol className="space-y-3">
           {references.map((ref) => (
-            <li key={ref.id} className="flex gap-2 text-sm">
+            <li className="flex gap-2 text-sm" key={ref.id}>
               <span
-                id={`ref-${ref.id}`}
                 className="font-medium text-muted-foreground"
+                id={`ref-${ref.id}`}
               >
                 {ref.id}
               </span>
@@ -32,10 +34,10 @@ export function ReferenceList({ references }: ReferenceListProps) {
                 <span className="text-muted-foreground">{ref.text}</span>
                 {ref.url && (
                   <a
-                    href={ref.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="ml-2 inline-flex items-center gap-1 text-emerald-500 hover:underline"
+                    href={ref.url}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     <ExternalLink className="size-3" />
                   </a>

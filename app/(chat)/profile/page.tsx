@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { auth } from "@/app/(auth)/auth";
 import { ProfileContent } from "@/components/profile/profile-content";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { getChallenges, getLeaderboard, getUser } from "@/lib/db/queries";
 
 export default async function ProfilePage() {
+  await connection();
   const session = await auth();
   if (!session?.user?.id || !session.user.email) {
     redirect("/sign-in");

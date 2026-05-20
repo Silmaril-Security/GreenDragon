@@ -27,7 +27,7 @@ import { getWeather } from "@/lib/ai/tools/get-weather";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
 import { updateDocument } from "@/lib/ai/tools/update-document";
 import { validateResponse } from "@/lib/challenges/validation";
-import { isProductionEnvironment } from "@/lib/constants";
+import { isProductionEnvironment, isTestEnvironment } from "@/lib/constants";
 import {
   createStreamId,
   deleteChatById,
@@ -55,6 +55,10 @@ let globalStreamContext: ResumableStreamContext | null = null;
 
 const getTokenlensCatalog = cache(
   async (): Promise<ModelCatalog | undefined> => {
+    if (isTestEnvironment) {
+      return;
+    }
+
     try {
       return await fetchModels();
     } catch (err) {
