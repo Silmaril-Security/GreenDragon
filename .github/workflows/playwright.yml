@@ -23,12 +23,21 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       AUTH_SECRET: playwright-test-secret
       POSTGRES_URL: postgres://postgres:postgres@localhost:5432/greendragon_test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/greendragon_test
       BLOB_READ_WRITE_TOKEN: playwright-test-token
-      REDIS_URL: ${{ secrets.REDIS_URL }}
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - uses: actions/checkout@v4
