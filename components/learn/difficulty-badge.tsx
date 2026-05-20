@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import type { CourseDifficulty } from "@/lib/db/schema";
+import { cn } from "@/lib/utils";
 
 const difficultyStyles: Record<
   CourseDifficulty,
@@ -41,7 +41,7 @@ export function DifficultyBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-full px-2.5 py-0.5 font-medium text-xs",
         style.className,
         className
       )}

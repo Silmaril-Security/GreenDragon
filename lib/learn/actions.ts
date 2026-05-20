@@ -1,28 +1,45 @@
 "use server";
 
 import {
-  getLearnCourses,
-  getFeaturedCourse,
-  getCourseBySlug,
-  getModulesByCourse,
-  getModuleBySlug,
-  getLessonsByModule,
+  getAdjacentLessons as getAdjacentLessonsQuery,
+  getCourseBySlug as getCourseBySlugQuery,
+  getFeaturedCourse as getFeaturedCourseQuery,
+  getLearnCourses as getLearnCoursesQuery,
   getLessonBySlug as getLessonBySlugQuery,
-  getAdjacentLessons,
+  getLessonsByModule as getLessonsByModuleQuery,
+  getModuleBySlug as getModuleBySlugQuery,
+  getModulesByCourse as getModulesByCourseQuery,
 } from "@/lib/db/queries";
 
-export {
-  getLearnCourses as getCourses,
-  getFeaturedCourse,
-  getCourseBySlug,
-  getModulesByCourse,
-  getLessonsByModule,
-  getAdjacentLessons,
-};
+export async function getCourses() {
+  return await getLearnCoursesQuery();
+}
+
+export async function getFeaturedCourse() {
+  return await getFeaturedCourseQuery();
+}
+
+export async function getCourseBySlug(slug: string) {
+  return await getCourseBySlugQuery(slug);
+}
+
+export async function getModulesByCourse(courseId: string) {
+  return await getModulesByCourseQuery(courseId);
+}
+
+export async function getLessonsByModule(moduleId: string) {
+  return await getLessonsByModuleQuery(moduleId);
+}
+
+export async function getAdjacentLessons(moduleId: string, sortOrder: number) {
+  return await getAdjacentLessonsQuery(moduleId, sortOrder);
+}
 
 export async function getCourseWithModulesAndLessons(slug: string) {
   const courseData = await getCourseBySlug(slug);
-  if (!courseData) return null;
+  if (!courseData) {
+    return null;
+  }
 
   const modules = await getModulesByCourse(courseData.id);
   const modulesWithLessons = await Promise.all(
@@ -41,13 +58,19 @@ export async function getLessonBySlug(
   lessonSlug: string
 ) {
   const courseData = await getCourseBySlug(courseSlug);
-  if (!courseData) return null;
+  if (!courseData) {
+    return null;
+  }
 
-  const moduleData = await getModuleBySlug(courseData.id, moduleSlug);
-  if (!moduleData) return null;
+  const moduleData = await getModuleBySlugQuery(courseData.id, moduleSlug);
+  if (!moduleData) {
+    return null;
+  }
 
   const lessonData = await getLessonBySlugQuery(moduleData.id, lessonSlug);
-  if (!lessonData) return null;
+  if (!lessonData) {
+    return null;
+  }
 
   return {
     course: courseData,

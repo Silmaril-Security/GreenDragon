@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Podium } from "@/components/leaderboard/podium";
 import { RankingsList } from "@/components/leaderboard/rankings-list";
 import { UserRankCard } from "@/components/leaderboard/user-rank-card";
@@ -5,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { getLeaderboardData } from "@/lib/leaderboard/actions";
 
 export default async function LeaderboardPage() {
+  await connection();
   const data = await getLeaderboardData();
 
   return (

@@ -1,4 +1,4 @@
-import { AlertTriangle, Lightbulb, Info, BarChart3 } from "lucide-react";
+import { AlertTriangle, BarChart3, Info, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type CalloutVariant = "warning" | "tip" | "info" | "statistic";
@@ -49,11 +49,11 @@ export function Callout({ variant, title, children, className }: CalloutProps) {
         className
       )}
     >
-      <div className="flex items-center gap-2 font-medium mb-2">
+      <div className="mb-2 flex items-center gap-2 font-medium">
         <Icon className="size-4" />
         <span>{title}</span>
       </div>
-      <div className="text-sm text-muted-foreground">{children}</div>
+      <div className="text-muted-foreground text-sm">{children}</div>
     </div>
   );
 }

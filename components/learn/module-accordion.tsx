@@ -1,11 +1,11 @@
 "use client";
 
+import { BookOpen, ChevronDown, ChevronRight, Clock } from "lucide-react";
 import { useState } from "react";
-import { ChevronDown, ChevronRight, BookOpen, Clock } from "lucide-react";
-import type { Module, Lesson } from "@/lib/db/schema";
+import type { Lesson, Module } from "@/lib/db/schema";
+import { cn } from "@/lib/utils";
 import { DifficultyBadge } from "./difficulty-badge";
 import { LessonRow } from "./lesson-row";
-import { cn } from "@/lib/utils";
 
 type ModuleAccordionProps = {
   module: Module;
@@ -32,9 +32,9 @@ export function ModuleAccordion({
   return (
     <div className="rounded-lg border bg-card">
       <button
-        type="button"
+        className="flex w-full items-start gap-3 rounded-t-lg p-4 text-left transition-colors hover:bg-accent/50"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-start gap-3 p-4 text-left hover:bg-accent/50 transition-colors rounded-t-lg"
+        type="button"
       >
         <div className="mt-1">
           {isOpen ? (
@@ -44,9 +44,9 @@ export function ModuleAccordion({
           )}
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-muted-foreground uppercase">
+            <span className="font-medium text-muted-foreground text-xs uppercase">
               Module {moduleNumber}
             </span>
             {module.difficulty && (
@@ -54,15 +54,15 @@ export function ModuleAccordion({
             )}
           </div>
 
-          <h3 className="font-semibold mt-1">{module.title}</h3>
+          <h3 className="mt-1 font-semibold">{module.title}</h3>
 
           {module.description && (
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="mt-1 text-muted-foreground text-sm">
               {module.description}
             </p>
           )}
 
-          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+          <div className="mt-2 flex items-center gap-4 text-muted-foreground text-sm">
             <span className="flex items-center gap-1">
               <BookOpen className="size-4" />
               {lessons.length} lessons
@@ -80,14 +80,14 @@ export function ModuleAccordion({
           isOpen ? "max-h-[2000px]" : "max-h-0"
         )}
       >
-        <div className="border-t divide-y">
+        <div className="divide-y border-t">
           {lessons.map((lesson, index) => (
             <LessonRow
+              courseSlug={courseSlug}
               key={lesson.id}
               lesson={lesson}
-              courseSlug={courseSlug}
-              moduleSlug={module.slug}
               lessonNumber={index + 1}
+              moduleSlug={module.slug}
             />
           ))}
         </div>

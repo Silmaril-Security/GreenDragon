@@ -501,7 +501,7 @@ function PureMultimodalInput({
             <StopButton setMessages={setMessages} stop={stop} />
           ) : (
             <PromptInputSubmit
-              className="size-8 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/30 hover:brightness-110 disabled:bg-none disabled:bg-muted disabled:text-foreground/40 disabled:shadow-none"
+              className="size-8 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20 shadow-md transition-all duration-200 hover:shadow-emerald-500/30 hover:shadow-lg hover:brightness-110 disabled:bg-muted disabled:bg-none disabled:text-foreground/40 disabled:shadow-none"
               data-testid="send-button"
               disabled={!input.trim() || uploadQueue.length > 0}
               status={status}

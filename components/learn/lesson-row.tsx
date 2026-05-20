@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ChevronRight, Clock } from "lucide-react";
+import Link from "next/link";
 import type { Lesson } from "@/lib/db/schema";
 
 type LessonRowProps = {
@@ -17,20 +17,20 @@ export function LessonRow({
 }: LessonRowProps) {
   return (
     <Link
+      className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent/50"
       href={`/learn/${courseSlug}/${moduleSlug}/${lesson.slug}`}
-      className="flex items-center gap-4 px-4 py-3 hover:bg-accent/50 transition-colors"
     >
-      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
+      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted font-medium text-muted-foreground text-xs">
         {lessonNumber}
       </span>
 
-      <div className="flex-1 min-w-0">
-        <span className="font-medium truncate block">{lesson.title}</span>
+      <div className="min-w-0 flex-1">
+        <span className="block truncate font-medium">{lesson.title}</span>
       </div>
 
-      <div className="flex items-center gap-4 text-sm text-muted-foreground shrink-0">
+      <div className="flex shrink-0 items-center gap-4 text-muted-foreground text-sm">
         {lesson.estimatedMinutes && (
-          <span className="hidden sm:flex items-center gap-1">
+          <span className="hidden items-center gap-1 sm:flex">
             <Clock className="size-4" />
             {lesson.estimatedMinutes} min
           </span>

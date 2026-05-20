@@ -1,8 +1,10 @@
+import { connection } from "next/server";
 import { ChallengesContent } from "@/components/challenges/challenges-content";
 import { ChallengesHeader } from "@/components/challenges/challenges-header";
 import { getChallengesWithStatus } from "@/lib/challenges/actions";
 
 export default async function ChallengesPage() {
+  await connection();
   const challenges = await getChallengesWithStatus();
 
   return (

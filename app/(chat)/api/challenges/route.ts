@@ -1,6 +1,9 @@
+import { connection } from "next/server";
 import { getChallenges } from "@/lib/db/queries";
 
 export async function GET() {
+  await connection();
+
   try {
     const challenges = await getChallenges();
 
