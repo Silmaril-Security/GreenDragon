@@ -1,6 +1,15 @@
-import type { LanguageModel } from "ai";
+import {
+  type LanguageModel,
+  type ModelMessage,
+  simulateReadableStream,
+} from "ai";
+import { getResponseChunksByPrompt } from "@/tests/prompts/utils";
 
-const createMockModel = (): LanguageModel => {
+const createMockModel = ({
+  isReasoningEnabled = false,
+}: {
+  isReasoningEnabled?: boolean;
+} = {}): LanguageModel => {
   return {
     specificationVersion: "v2",
     provider: "mock",
@@ -16,16 +25,11 @@ const createMockModel = (): LanguageModel => {
       content: [{ type: "text", text: "Hello, world!" }],
       warnings: [],
     }),
-    doStream: async () => ({
-      stream: new ReadableStream({
-        start(controller) {
-          controller.enqueue({
-            type: "text-delta",
-            id: "mock-id",
-            delta: "Mock response",
-          });
-          controller.close();
-        },
+    doStream: async ({ prompt }: { prompt: ModelMessage[] }) => ({
+      stream: simulateReadableStream({
+        chunkDelayInMs: 50,
+        chunks: getResponseChunksByPrompt(prompt, isReasoningEnabled),
+        initialDelayInMs: 100,
       }),
       rawCall: { rawPrompt: null, rawSettings: {} },
     }),
@@ -33,10 +37,14 @@ const createMockModel = (): LanguageModel => {
 };
 
 export const chatModel = createMockModel();
-export const reasoningModel = createMockModel();
+export const reasoningModel = createMockModel({ isReasoningEnabled: true });
 export const titleModel = createMockModel();
 export const artifactModel = createMockModel();
 
-export function getMockModel(_modelId: string) {
+export function getMockModel(modelId: string) {
+  if (modelId.includes("reasoning")) {
+    return reasoningModel;
+  }
+
   return chatModel;
 }

@@ -9,10 +9,25 @@ jobs:
   test:
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: greendragon_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
-      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+      AUTH_SECRET: playwright-test-secret
+      POSTGRES_URL: postgres://postgres:postgres@localhost:5432/greendragon_test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/greendragon_test
+      BLOB_READ_WRITE_TOKEN: playwright-test-token
       REDIS_URL: ${{ secrets.REDIS_URL }}
 
     steps:
@@ -50,6 +65,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Prepare test database
+        run: pnpm exec drizzle-kit push --force
 
       - name: Cache Playwright browsers
         uses: actions/cache@v3
